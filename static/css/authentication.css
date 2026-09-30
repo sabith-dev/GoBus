@@ -1,0 +1,161 @@
+/* ============ GoBus Auth Pages ============ */
+:root {
+    --gb-primary: #1f1f7a;
+    --gb-accent: #ff7f11;
+    --gb-accent-dark: #e66a00;
+    --gb-dark: #16163b;
+    --gb-text: #2c3e50;
+    --gb-muted: #7f8c9b;
+    --gb-light: #f4f6fb;
+    --gb-white: #ffffff;
+    --gb-border: #e6eaf2;
+    --gb-shadow-lg: 0 18px 50px rgba(22, 22, 59, 0.15);
+}
+
+/* ---------- Full page wrapper ---------- */
+.auth-page {
+    min-height: calc(100vh - 160px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.25rem;
+    position: relative;
+    background:
+        radial-gradient(640px 320px at 12% 8%, rgba(255, 127, 17, 0.10), transparent 60%),
+        radial-gradient(640px 340px at 90% 92%, rgba(31, 31, 122, 0.12), transparent 60%),
+        var(--gb-light);
+}
+
+/* ---------- Card ---------- */
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--gb-white);
+    border-radius: 22px;
+    box-shadow: var(--gb-shadow-lg);
+    overflow: hidden;
+    animation: authFadeUp 0.45s ease;
+}
+
+@keyframes authFadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-head {
+    padding: 2.4rem 2.2rem 1.25rem;
+    text-align: center;
+    background: linear-gradient(160deg, #ffffff 0%, #f7f8fe 100%);
+    border-bottom: 1px solid var(--gb-border);
+}
+
+.auth-emblem {
+    width: 74px;
+    height: 74px;
+    margin: 0 auto 1.1rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gb-primary) 0%, #3423a0 55%, var(--gb-accent) 140%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.85rem;
+    box-shadow: 0 10px 24px rgba(31, 31, 122, 0.35);
+}
+
+.auth-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--gb-dark);
+    margin: 0;
+}
+
+.auth-sub {
+    color: var(--gb-muted);
+    margin: 0.35rem 0 0;
+    font-size: 0.95rem;
+}
+
+/* ---------- Form ---------- */
+.auth-body {
+    padding: 1.8rem 2.2rem 2.1rem;
+}
+
+.auth-body .form-label {
+    font-weight: 600;
+    font-size: 0.87rem;
+    color: var(--gb-text);
+}
+
+.auth-body .form-control {
+    border-radius: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--gb-border);
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.auth-body .form-control:focus {
+    border-color: var(--gb-primary);
+    box-shadow: 0 0 0 3px rgba(31, 31, 122, 0.12);
+}
+
+.auth-body .text-danger,
+.auth-body .invalid-feedback,
+.auth-body #hint_id_username,
+.auth-body #hint_id_password1,
+.auth-body #hint_id_password2 {
+    font-size: 0.82rem;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 30px;
+    background: var(--gb-accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(255, 127, 17, 0.35);
+    transition: all 0.25s;
+}
+
+.auth-btn:hover {
+    background: var(--gb-accent-dark);
+    transform: translateY(-1px);
+}
+
+.auth-field-note {
+    display: block;
+    margin: 0.9rem 0;
+    text-align: center;
+    color: var(--gb-muted);
+    font-size: 0.85rem;
+}
+
+/* ---------- Footer of card ---------- */
+.auth-foot {
+    padding: 1.15rem 2.2rem;
+    text-align: center;
+    border-top: 1px solid var(--gb-border);
+    background: #fafbfe;
+    font-size: 0.92rem;
+    color: var(--gb-muted);
+}
+
+.auth-foot a {
+    color: var(--gb-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-foot a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Minimal auth navbar ---------- */
+.gb-navbar-auth {
+    background: #ffffff;
+    box-shadow: 0 1px 10px rgba(22, 22, 59, 0.07);
+}

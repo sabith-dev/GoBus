@@ -1,0 +1,53 @@
+{% extends 'base_passenger.html' %}
+{% block title %}Booking Confirmed - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="panel-card" style="max-width: 640px; margin: 0 auto; text-align:center;">
+        <div class="panel-body" style="padding: 3rem 2rem;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" style="width:72px; height:72px; margin: 0 auto 1.25rem;">
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <h1 style="color:#16a34a;">Booking Confirmed!</h1>
+            <p class="page-subtitle" style="color: var(--color-muted);">Your booking has been confirmed successfully. Safe travels!</p>
+
+            <div style="max-width: 380px; margin: 1.75rem auto 0; text-align:left;">
+                <div class="ticket-row">
+                    <span class="k">Booking ID</span>
+                    <span class="v">{{ booking.booking_id }}</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="k">Route</span>
+                    <span class="v">{{ booking.schedule.route }}</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="k">Travel Date</span>
+                    <span class="v">{{ booking.travel_date|date:'d M Y' }}</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="k">Seats</span>
+                    <span class="v">{% for s in seats %}{{ s.seat.seat_number }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="k">Amount Paid</span>
+                    <span class="v" style="color:#16a34a;">₹{{ booking.final_amount|floatformat:2 }}</span>
+                </div>
+                <hr class="ticket-divider">
+                <div class="ticket-row">
+                    <span class="k">Status</span>
+                    <span class="v"><span class="badge green">{{ booking.get_status_display }}</span></span>
+                </div>
+            </div>
+
+            <div class="action-buttons" style="justify-content:center; margin-top:2rem;">
+                <a href="{% url 'passengers:ticket' booking_id=booking.id %}" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5v14l18-7z"/></svg>
+                    View Ticket
+                </a>
+                <a href="{% url 'passengers:search' %}" class="btn btn-outline">Book Another Trip</a>
+                <a href="{% url 'passengers:my_bookings' %}" class="btn btn-outline">My Bookings</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

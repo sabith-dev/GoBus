@@ -1,0 +1,80 @@
+{% extends 'base_passenger.html' %}
+{% block title %}Booking Details - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="breadcrumb">
+        <a href="{% url 'passengers:my_bookings' %}">My Bookings</a>
+        <span class="separator">/</span>
+        <span class="current">Booking {{ booking.booking_id|truncatechars:10 }}</span>
+    </div>
+
+    <div class="page-header">
+        <div>
+            <h1>Booking Details</h1>
+            <p class="page-subtitle">Everything about this booking.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'passengers:my_bookings' %}" class="btn btn-outline">Back to Bookings</a>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items:start;">
+        <div class="panel-card">
+            <div class="panel-head">
+                <div class="panel-title">Booking #{{ booking.booking_id|truncatechars:12 }}</div>
+                <span class="badge {% if booking.status == 'confirmed' %}green{% elif booking.status == 'pending' %}yellow{% elif booking.status == 'cancelled' %}red{% else %}blue{% endif %}">{{ booking.get_status_display }}</span>
+            </div>
+            <div class="panel-body">
+                <div class="info-item">
+                    <span class="info-label">Journey</span>
+                    <span class="info-value">{{ booking.schedule.route.origin }} → {{ booking.schedule.route.destination }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Bus</span>
+                    <span class="info-value">{{ booking.schedule.bus.bus_name }} ({{ booking.schedule.bus.bus_number }})</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Departure</span>
+                    <span class="info-value">{{ booking.travel_date|date:'d M Y' }} · {{ booking.schedule.departure_time|time:'h:i A' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Seats</span>
+                    <span class="info-value">{% for s in seats %}{{ s.seat.seat_number }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Amount Paid</span>
+                    <span class="info-value highlight">₹{{ booking.final_amount|floatformat:2 }}</span>
+                </div>
+                {% if payment %}
+                <div class="info-item">
+                    <span class="info-label">Payment</span>
+                    <span class="info-value">{{ payment.get_method_display }} · {{ payment.transaction_id }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-head">
+                <div class="panel-title">Actions</div>
+            </div>
+            <div class="panel-body" style="display:flex; flex-direction:column; gap:0.6rem;">
+                {% if booking.status != 'cancelled' %}
+                <a href="{% url 'passengers:ticket' booking_id=booking.id %}" class="btn btn-primary" style="width:100%; text-align:center;">View Ticket</a>
+                <a href="{% url 'passengers:live_tracking' booking_id=booking.id %}" class="btn btn-outline" style="width:100%; text-align:center;">Track Bus</a>
+                {% endif %}
+            </div>
+            {% if booking.status == 'confirmed' or booking.status == 'pending' %}
+            <div class="panel-body" style="border-top:1px solid var(--color-border);">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="fg-title" style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--color-muted); margin-bottom:0.5rem;">Cancel Booking</div>
+                    <textarea name="reason" rows="3" class="form-control" placeholder="Reason for cancellation" required></textarea>
+                    <button type="submit" class="btn btn-danger btn-sm" style="width:100%; margin-top:0.75rem;">Request Cancellation</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,244 @@
+{% extends "admin_portal/base_admin.html" %} {% block content %}
+
+<div class="admin-payments">
+  <h1>Payments & Settlements</h1>
+  <p class="subtitle">Track payments, refunds, and settlements</p>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <h3>Total Settled</h3>
+      <div class="amount">₹{{ total_settled|default:"0" }}</div>
+      <div class="period">All time</div>
+    </div>
+    <div class="summary-card alt">
+      <h3>Total Refunded</h3>
+      <div class="amount">₹{{ total_refunded|default:"0" }}</div>
+      <div class="period">All time</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(event, 'tab-all')">
+      All Payments
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-refunds')">
+      Refunds
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-settlement')">
+      Settlement
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-commission')">
+      Commission
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-gst')">GST</button>
+  </div>
+
+  <div id="tab-all" class="tab-content active">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>User</th>
+            <th>Booking</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+          <tr>
+            <td><strong>#{{ p.id }}</strong></td>
+            <td>{{ p.user.username }}</td>
+            <td>#{{ p.booking.id }}</td>
+            <td>₹{{ p.amount }}</td>
+            <td>{{ p.method }}</td>
+            <td>
+              {% if p.status == 'completed' or p.status == 'success' %}<span class="badge badge-green"
+                >Success</span
+              >
+              {% elif p.status == 'pending' %}<span class="badge badge-yellow"
+                >Pending</span
+              >
+              {% elif p.status == 'failed' %}<span class="badge badge-red"
+                >Failed</span
+              >
+              {% else %}<span class="badge badge-pink">{{ p.status }}</span>{% endif %}
+            </td>
+            <td>{{ p.created_at|date:"d M Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="empty-state">No payments found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-refunds" class="tab-content">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Refund ID</th>
+            <th>User</th>
+            <th>Booking</th>
+            <th>Amount</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in refunds %}
+          <tr>
+            <td><strong>#{{ r.id }}</strong></td>
+            <td>{{ r.booking.passenger.username|default:"—" }}</td>
+            <td>#{{ r.booking.id }}</td>
+            <td>₹{{ r.amount }}</td>
+            <td>{{ r.reason|default:"—" }}</td>
+            <td>
+              <span
+                class="badge {% if r.status == 'completed' or r.status == 'approved' %}badge-green{% elif r.status == 'pending' %}badge-yellow{% else %}badge-red{% endif %}"
+                >{{ r.status }}</span
+              >
+            </td>
+            <td>{{ r.created_at|date:"d M Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="empty-state">No refunds</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-settlement" class="tab-content">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Agency</th>
+            <th>Period</th>
+            <th>Bookings</th>
+            <th>Gross</th>
+            <th>Commission</th>
+            <th>Net Payable</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in settlements %}
+          <tr>
+            <td><strong>{{ s.agency_name }}</strong></td>
+            <td>{{ s.period }}</td>
+            <td>{{ s.booking_count }}</td>
+            <td>₹{{ s.gross_amount }}</td>
+            <td>₹{{ s.commission_amount }}</td>
+            <td>₹{{ s.net_amount }}</td>
+            <td>
+              <span
+                class="badge {% if s.status == 'paid' %}badge-green{% elif s.status == 'pending' %}badge-yellow{% else %}badge-pink{% endif %}"
+                >{{ s.status }}</span
+              >
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="empty-state">No settlement records</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-commission" class="tab-content">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Agency</th>
+            <th>Rate</th>
+            <th>Total Bookings</th>
+            <th>Gross Revenue</th>
+            <th>Commission Earned</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in commissions %}
+          <tr>
+            <td><strong>{{ c.agency_name }}</strong></td>
+            <td>{{ c.commission_rate }}%</td>
+            <td>{{ c.booking_count }}</td>
+            <td>₹{{ c.gross_revenue|default:"0" }}</td>
+            <td>₹{{ c.commission_earned|default:"0" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="empty-state">No commission data</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-gst" class="tab-content">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Taxable Amount</th>
+            <th>CGST</th>
+            <th>SGST</th>
+            <th>Total GST</th>
+            <th>Filing Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for g in gst_records %}
+          <tr>
+            <td><strong>{{ g.period }}</strong></td>
+            <td>₹{{ g.taxable_amount }}</td>
+            <td>₹{{ g.cgst }}</td>
+            <td>₹{{ g.sgst }}</td>
+            <td>₹{{ g.total_gst }}</td>
+            <td>
+              <span
+                class="badge {% if g.is_filed %}badge-green{% else %}badge-yellow{% endif %}"
+                >{{ g.is_filed|yesno:"Filed,Pending" }}</span
+              >
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="empty-state">No GST records</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(e, tabId) {
+    document
+      .querySelectorAll(".tab-btn")
+      .forEach((b) => b.classList.remove("active"));
+    document
+      .querySelectorAll(".tab-content")
+      .forEach((c) => c.classList.remove("active"));
+    e.target.classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+  }
+</script>
+{% endblock %}

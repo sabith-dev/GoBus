@@ -1,0 +1,182 @@
+﻿{% extends "admin_portal/base_admin.html" %} {% block content %}
+
+<div class="admin-cms">
+  <h1>Content Management</h1>
+  <p class="subtitle">Manage website content and pages</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(event, 'tab-banner')">
+      Homepage Banner
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-offers')">
+      Offers
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-blogs')">
+      Blogs
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-faq')">FAQ</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-privacy')">
+      Privacy Policy
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-terms')">
+      Terms of Service
+    </button>
+  </div>
+
+  <div id="tab-banner" class="tab-content active">
+    <div class="section-header">
+      <div class="section-title">Homepage Banners</div>
+      <button class="btn btn-primary btn-sm">+ Add Banner</button>
+    </div>
+    {% for banner in banners %}
+    <div class="content-card">
+      <div class="banner-preview">
+        ðŸ–¼ï¸ {{ banner.title }} â€” Banner Image Preview
+      </div>
+      <h4>{{ banner.title }}</h4>
+      <p>{{ banner.description|default:"No description" }}</p>
+      <div class="meta">
+        <span
+          class="badge {% if banner.is_active %}badge-green{% else %}badge-yellow{% endif %}"
+          >{{ banner.is_active|yesno:"Active,Inactive" }}</span
+        >
+        <span style="margin-left: 0.5rem">Sort: {{ banner.sort_order }}</span>
+      </div>
+      <div style="margin-top: 0.75rem">
+        <button class="btn btn-outline btn-sm">Edit</button>
+      </div>
+    </div>
+    {% empty %}
+    <p class="empty-state">No banners configured</p>
+    {% endfor %}
+  </div>
+
+  <div id="tab-offers" class="tab-content">
+    <div class="section-header">
+      <div class="section-title">Offer Pages</div>
+      <button class="btn btn-primary btn-sm">+ Create Offer Page</button>
+    </div>
+    {% for page in offer_pages %}
+    <div class="content-card">
+      <h4>{{ page.title }}</h4>
+      <p>{{ page.description|truncatewords:30 }}</p>
+      <div class="meta">
+        <span
+          class="badge {% if page.is_active %}badge-green{% else %}badge-yellow{% endif %}"
+          >{{ page.is_active|yesno:"Published,Draft" }}</span
+        >
+      </div>
+      <div style="margin-top: 0.75rem">
+        <button class="btn btn-outline btn-sm">Edit</button>
+      </div>
+    </div>
+    {% empty %}
+    <p class="empty-state">No offer pages</p>
+    {% endfor %}
+  </div>
+
+  <div id="tab-blogs" class="tab-content">
+    <div class="section-header">
+      <div class="section-title">Blog Posts</div>
+      <button class="btn btn-primary btn-sm">+ New Blog Post</button>
+    </div>
+    {% for blog in blogs %}
+    <div class="content-card">
+      <h4>{{ blog.title }}</h4>
+      <p>{{ blog.excerpt|truncatewords:30 }}</p>
+      <div class="meta">
+        <span>By {{ blog.author|default:"Admin" }}</span> Â·
+        <span>{{ blog.created_at|date:"d M Y" }}</span>
+        <span
+          class="badge {% if blog.is_published %}badge-green{% else %}badge-yellow{% endif %}"
+          style="margin-left: 0.5rem"
+          >{{ blog.is_published|yesno:"Published,Draft" }}</span
+        >
+      </div>
+      <div style="margin-top: 0.75rem">
+        <button class="btn btn-outline btn-sm">Edit</button>
+      </div>
+    </div>
+    {% empty %}
+    <p class="empty-state">No blog posts</p>
+    {% endfor %}
+  </div>
+
+  <div id="tab-faq" class="tab-content">
+    <div class="section-header">
+      <div class="section-title">FAQ</div>
+      <button class="btn btn-primary btn-sm">+ Add FAQ</button>
+    </div>
+    {% for faq in faqs %}
+    <div class="content-card">
+      <h4>{{ faq.question }}</h4>
+      <p>{{ faq.answer|truncatewords:40 }}</p>
+      <div style="margin-top: 0.75rem">
+        <button class="btn btn-outline btn-sm">Edit</button>
+      </div>
+    </div>
+    {% empty %}
+    <p class="empty-state">No FAQ entries</p>
+    {% endfor %}
+  </div>
+
+  <div id="tab-privacy" class="tab-content">
+    <div class="section-header">
+      <div class="section-title">Privacy Policy</div>
+      <button class="btn btn-outline btn-sm">Edit</button>
+    </div>
+    <div class="rich-editor">
+      <div class="editor-toolbar">
+        <button title="Bold"><b>B</b></button>
+        <button title="Italic"><i>I</i></button>
+        <button title="Underline"><u>U</u></button>
+        <button title="Link">ðŸ”—</button>
+        <button title="List">â˜°</button>
+      </div>
+      <div class="editor-area" contenteditable="true">
+        {% if privacy_content %}{{ privacy_content|safe }}{% else %}
+        <p style="color: #7f8c9b">
+          No privacy policy content. Click Edit to add content.
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-terms" class="tab-content">
+    <div class="section-header">
+      <div class="section-title">Terms of Service</div>
+      <button class="btn btn-outline btn-sm">Edit</button>
+    </div>
+    <div class="rich-editor">
+      <div class="editor-toolbar">
+        <button title="Bold"><b>B</b></button>
+        <button title="Italic"><i>I</i></button>
+        <button title="Underline"><u>U</u></button>
+        <button title="Link">ðŸ”—</button>
+        <button title="List">â˜°</button>
+      </div>
+      <div class="editor-area" contenteditable="true">
+        {% if terms_content %}{{ terms_content|safe }}{% else %}
+        <p style="color: #7f8c9b">
+          No terms content. Click Edit to add content.
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(e, tabId) {
+    document
+      .querySelectorAll(".tab-btn")
+      .forEach((b) => b.classList.remove("active"));
+    document
+      .querySelectorAll(".tab-content")
+      .forEach((c) => c.classList.remove("active"));
+    e.target.classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+  }
+</script>
+{% endblock %}

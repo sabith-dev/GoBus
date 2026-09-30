@@ -1,0 +1,176 @@
+{% extends "admin_portal/base_admin.html" %}
+{% load static %}
+
+{% block title %}Agency Management{% endblock %}
+
+{% block content %}
+<div class="admin-users">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Agency Management</h1>
+      <p class="page-subtitle">View and manage all registered transport agencies.</p>
+    </div>
+    <div class="action-buttons">
+      <span class="count-chip">{{ agencies|length }} total</span>
+    </div>
+  </div>
+
+  <div class="panel-card">
+
+    <div class="panel-toolbar">
+      <form method="GET" action="">
+        <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search agencies..." />
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+
+      <div class="filter-tabs">
+        <a href="?status=all{% if query %}&q={{ query }}{% endif %}"
+          class="filter-tab {% if status_filter == 'all' or not status_filter %}active{% endif %}">
+          All
+        </a>
+        <a href="?status=approved{% if query %}&q={{ query }}{% endif %}"
+          class="filter-tab {% if status_filter == 'approved' %}active{% endif %}">
+          Approved
+        </a>
+        <a href="?status=pending{% if query %}&q={{ query }}{% endif %}"
+          class="filter-tab {% if status_filter == 'pending' %}active{% endif %}">
+          Pending
+        </a>
+        <a href="?status=blacklisted{% if query %}&q={{ query }}{% endif %}"
+          class="filter-tab {% if status_filter == 'blacklisted' %}active{% endif %}">
+          Blacklisted
+        </a>
+      </div>
+    </div>
+
+    <form method="POST" action="" id="bulkForm">
+      {% csrf_token %}
+      <div id="bulkBar" class="bulk-bar visible" style="display:none;border:none;border-bottom:1px solid var(--color-border);border-radius:0;">
+        <label id="selectedCount" style="margin:0;font-weight:600;">0 selected</label>
+        <select name="bulk_action" required>
+          <option value="" disabled selected>Choose action</option>
+          <option value="approve">Approve</option>
+          <option value="blacklist">Blacklist</option>
+          <option value="unblacklist">Remove from Blacklist</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+        <button type="button" onclick="clearSelection()" class="btn btn-outline btn-sm" style="margin-left:auto;">Clear</button>
+      </div>
+
+      <div class="table-wrap" style="border:none;border-radius:0;margin-bottom:0;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:48px;text-align:center;">
+                <input type="checkbox" id="selectAll" onchange="toggleAll(this)">
+              </th>
+              <th>Name</th>
+              <th>Owner</th>
+              <th>City</th>
+              <th>Rating</th>
+              <th style="text-align:center;">Approved</th>
+              <th style="text-align:center;">Blacklisted</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for agency in agencies %}
+            <tr>
+              <td style="text-align:center;">
+                <input type="checkbox" name="selected_agencies" value="{{ agency.pk }}" class="agency-check" onchange="updateBulkBar()">
+              </td>
+              <td>
+                <a href="{% url 'admin_portal:agency_detail' pk=agency.pk %}" style="color:var(--color-primary);font-weight:600;text-decoration:none;">
+                  {{ agency.agency_name }}
+                </a>
+              </td>
+              <td>{{ agency.user.get_full_name|default:agency.user.username }}</td>
+              <td>{{ agency.city|default:"—" }}</td>
+              <td>
+                <span class="starred" style="letter-spacing:1px;">
+                  {% for i in "12345" %}{% if forloop.counter <= agency.rating %}&#9733;{% else %}<span style="color:#E5E7EB;">&#9733;</span>{% endif %}{% endfor %}
+                </span>
+              </td>
+              <td style="text-align:center;">
+                {% if agency.is_approved %}
+                  <span class="badge badge-success">Yes</span>
+                {% else %}
+                  <span class="badge badge-warning">No</span>
+                {% endif %}
+              </td>
+              <td style="text-align:center;">
+                {% if agency.is_blacklisted %}
+                  <span class="badge badge-danger">Yes</span>
+                {% else %}
+                  <span class="badge badge-green">No</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="empty-state">No agencies found matching your criteria.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </form>
+
+  </div>
+
+  {% if is_paginated %}
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="page-link">
+      &laquo; Prev
+    </a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+      <a href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="page-link active">{{ num }}</a>
+      {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+      <a href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="page-link">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="page-link">
+      Next &raquo;
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+  function toggleAll(el) {
+    document.querySelectorAll('.agency-check').forEach(function(cb) {
+      cb.checked = el.checked;
+    });
+    updateBulkBar();
+  }
+
+  function updateBulkBar() {
+    var checked = document.querySelectorAll('.agency-check:checked');
+    var bar = document.getElementById('bulkBar');
+    var count = document.getElementById('selectedCount');
+    if (checked.length > 0) {
+      bar.style.display = 'flex';
+      count.textContent = checked.length + ' selected';
+    } else {
+      bar.style.display = 'none';
+      count.textContent = '0 selected';
+    }
+    var all = document.getElementById('selectAll');
+    all.checked = checked.length === document.querySelectorAll('.agency-check').length && checked.length > 0;
+  }
+
+  function clearSelection() {
+    document.querySelectorAll('.agency-check').forEach(function(cb) {
+      cb.checked = false;
+    });
+    document.getElementById('selectAll').checked = false;
+    updateBulkBar();
+  }
+</script>
+{% endblock %}

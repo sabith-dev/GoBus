@@ -1,0 +1,172 @@
+{% extends 'base_agency.html' %}
+{% block title %}Agency Profile - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    {% if profile %}
+    <div class="profile-hero">
+        <div class="profile-logo">
+            {% if profile.logo %}<img src="{{ profile.logo.url }}" alt="{{ profile.agency_name }}">{% else %}{{ profile.agency_name|first|upper }}{% endif %}
+        </div>
+        <div class="profile-id">
+            <div class="pi-kicker">Agency Profile</div>
+            <h1 class="pi-name">{{ profile.agency_name }}</h1>
+            <div class="pi-code">Agency Code: <strong>{{ profile.agency_code }}</strong></div>
+            {% if profile.description %}<p class="pi-desc">{{ profile.description }}</p>{% endif %}
+            <div class="profile-badges">
+                <span class="badge">{{ profile.get_status_display }}</span>
+                {% if profile.is_verified %}
+                    <span class="badge"><span class="status-dot active"></span> Verified</span>
+                {% else %}
+                    <span class="badge"><span class="status-dot"></span> Unverified</span>
+                {% endif %}
+                {% if profile.rating %}<span class="badge">&#9733; {{ profile.rating }}</span>{% endif %}
+            </div>
+        </div>
+        <div class="profile-actions">
+            <a href="{% url 'agencies:settings' %}" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                Manage Settings
+            </a>
+            <a href="{% url 'agencies:bus_list' %}" class="btn btn-outline" style="background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.3); color:#fff;">Manage Fleet</a>
+        </div>
+    </div>
+
+    <div class="profile-stats">
+        <div class="profile-stat">
+            <div class="ps-value">{{ buses_count }}</div>
+            <div class="ps-label">Buses</div>
+        </div>
+        <div class="profile-stat">
+            <div class="ps-value">{{ routes_count }}</div>
+            <div class="ps-label">Routes</div>
+        </div>
+        <div class="profile-stat">
+            <div class="ps-value">{{ schedules_count }}</div>
+            <div class="ps-label">Schedules</div>
+        </div>
+        <div class="profile-stat">
+            <div class="ps-value">{{ total_bookings }}</div>
+            <div class="ps-label">Total Bookings</div>
+        </div>
+        <div class="profile-stat">
+            <div class="ps-value">&#8377; {{ earnings_total|floatformat:0 }}</div>
+            <div class="ps-label">Life-time Revenue</div>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap:1.5rem; align-items:start;">
+        <div class="panel-card">
+            <div class="panel-head">
+                <div class="panel-title">Agency Information</div>
+            </div>
+            <div class="panel-body">
+                <div class="kv-2col">
+                    <div class="item">
+                        <span class="lbl">Agency Name</span>
+                        <span class="val">{{ profile.agency_name }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Agency Code</span>
+                        <span class="val">{{ profile.agency_code }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">GST Number</span>
+                        <span class="val">{{ profile.gst_number|default:"—" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">PAN Number</span>
+                        <span class="val">{{ profile.pan_number|default:"—" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Account Status</span>
+                        <span class="val">{{ profile.get_status_display }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Verification</span>
+                        <span class="val">{% if profile.is_verified %}Verified{% else %}Pending{% endif %}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Member Since</span>
+                        <span class="val">{{ user.date_joined|date:"d M Y" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Agency Rating</span>
+                        <span class="val">{% if profile.rating %}&#9733; {{ profile.rating }}{% else %}No ratings yet{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-head">
+                <div class="panel-title">Contact &amp; Location</div>
+            </div>
+            <div class="panel-body">
+                <div class="kv-2col">
+                    <div class="item">
+                        <span class="lbl">Contact Email</span>
+                        <span class="val">{{ profile.contact_email|default:user.email|default:"Not set" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Phone</span>
+                        <span class="val">{{ profile.contact_phone|default:user.phone_number|default:"Not set" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Website</span>
+                        <span class="val">{% if profile.website %}{{ profile.website }}{% else %}Not set{% endif %}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Username</span>
+                        <span class="val">@{{ user.username }}</span>
+                    </div>
+                    <div class="item" style="grid-column:1/-1;">
+                        <span class="lbl">Address</span>
+                        <span class="val">{{ profile.address|default:"Not set" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">City</span>
+                        <span class="val">{{ profile.city|default:"—" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">State</span>
+                        <span class="val">{{ profile.state|default:"—" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Pincode</span>
+                        <span class="val">{{ profile.pincode|default:"—" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-card" style="margin-top:1.5rem;">
+        <div class="panel-head">
+            <div class="panel-title">Quick Links</div>
+        </div>
+        <div class="panel-body">
+            <div class="portal-footer-links">
+                <a href="{% url 'agencies:dashboard' %}">Dashboard</a> &middot;
+                <a href="{% url 'agencies:bus_list' %}">Buses</a> &middot;
+                <a href="{% url 'agencies:route_list' %}">Routes</a> &middot;
+                <a href="{% url 'agencies:schedule_list' %}">Schedules</a> &middot;
+                <a href="{% url 'agencies:booking_list' %}">Bookings</a> &middot;
+                <a href="{% url 'agencies:earnings' %}">Earnings</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="panel-card">
+        <div class="panel-head">
+            <div class="panel-title">Agency Profile</div>
+        </div>
+        <div class="panel-body">
+            <div class="empty-state">
+                <p>Your agency profile is not set up yet.</p>
+                <a href="{% url 'agencies:settings' %}" class="btn btn-primary">Complete Your Profile</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

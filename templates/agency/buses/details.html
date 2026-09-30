@@ -1,0 +1,88 @@
+{% extends 'base_agency.html' %}
+{% block title %}Bus Details - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="breadcrumb">
+        <a href="{% url 'agencies:dashboard' %}">Dashboard</a>
+        <span class="separator">/</span>
+        <a href="{% url 'agencies:bus_list' %}">Buses</a>
+        <span class="separator">/</span>
+        <span class="current">{{ bus.bus_name }}</span>
+    </div>
+
+    <div class="page-header">
+        <div>
+            <h1>Bus Details</h1>
+            <p class="page-subtitle">{{ bus.bus_name }} · {{ bus.bus_number }}</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:bus_edit' bus_id=bus.id %}" class="btn btn-primary">Edit Bus</a>
+            <a href="{% url 'agencies:bus_list' %}" class="btn btn-outline">Back to Buses</a>
+        </div>
+    </div>
+
+    <div class="stat-grid" style="margin-bottom:1.5rem;">
+        <div class="stat-card blue">
+            <span class="label">Seats Configured</span>
+            <span class="value">{{ total_variants }}</span>
+            <span class="trend">{{ bus.total_seats }} planned capacity</span>
+        </div>
+        <div class="stat-card green">
+            <span class="label">Active Schedules</span>
+            <span class="value">{{ active_schedules }}</span>
+            <span class="trend">routes operated</span>
+        </div>
+        <div class="stat-card yellow">
+            <span class="label">Total Bookings</span>
+            <span class="value">{{ bookings_count }}</span>
+            <span class="trend">all time</span>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="panel-head">
+            <div class="panel-title">{{ bus.bus_name }}</div>
+        </div>
+        <div class="panel-body">
+            <div class="info-item">
+                <span class="info-label">Registration Number</span>
+                <span class="info-value">{{ bus.bus_number }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Bus Type</span>
+                <span class="info-value">{{ bus.bus_type }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Capacity</span>
+                <span class="info-value">{{ bus.total_seats }} seats</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Amenities</span>
+                <span class="info-value">
+                    {% if bus.bus_type %}
+                        {% for a in bus.bus_type.amenities %}<span class="badge blue">{{ a }}</span> {% empty %}—{% endfor %}
+                    {% else %}—{% endif %}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Status</span>
+                <span class="info-value highlight">
+                    <span class="badge {% if bus.status == 'active' %}green{% elif bus.status == 'inactive' %}blue{% else %}yellow{% endif %}">{{ bus.get_status_display }}</span>
+                </span>
+            </div>
+            {% if latest_location %}
+            <div class="info-item">
+                <span class="info-label">Last Known Position</span>
+                <span class="info-value">{{ latest_location.latitude }}, {{ latest_location.longitude }} · {{ latest_location.speed }} km/h</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="action-buttons" style="margin-top:1.5rem;">
+        <a href="{% url 'agencies:bus_seats' bus_id=bus.id %}" class="btn btn-primary">Manage Seats</a>
+        <a href="{% url 'agencies:bus_edit' bus_id=bus.id %}" class="btn btn-outline">Edit</a>
+        <a href="{% url 'agencies:bus_list' %}" class="btn btn-outline">Back to List</a>
+    </div>
+</div>
+{% endblock %}

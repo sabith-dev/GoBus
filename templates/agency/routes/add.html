@@ -1,0 +1,32 @@
+{% extends 'base_agency.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Add Route - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Add Route</h1>
+            <p class="page-subtitle">Create a new route for your agency.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:route_list' %}" class="btn btn-outline">Back to Routes</a>
+        </div>
+    </div>
+
+    <div class="panel-card" style="max-width: 900px;">
+        <div class="panel-head">
+            <div class="panel-title">Route Details</div>
+        </div>
+        <div class="panel-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="action-buttons" style="margin-top:1.25rem;">
+                    <button type="submit" class="btn btn-primary">Add Route</button>
+                    <a href="{% url 'agencies:route_list' %}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

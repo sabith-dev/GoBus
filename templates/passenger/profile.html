@@ -1,0 +1,79 @@
+{% extends 'base_passenger.html' %}
+{% block title %}Profile - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Profile</h1>
+            <p class="page-subtitle">Your personal information.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'passengers:edit_profile' %}" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+                Edit Profile
+            </a>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 320px 1fr; gap: 1.5rem; align-items:start;">
+        <div class="panel-card" style="text-align:center;">
+            <div class="panel-body">
+                {% if profile and profile.profile_photo %}
+                    <img src="{{ profile.profile_photo.url }}" class="admin-user-avatar" style="width:110px; height:110px; font-size:2.4rem; margin:0 auto 1rem;">
+                {% else %}
+                    <div class="admin-user-avatar" style="width:110px; height:110px; font-size:2.4rem; margin:0 auto 1rem;">{{ user.first_name.0|default:user.username.0|upper }}{{ user.last_name.0|default:"" }}</div>
+                {% endif %}
+                <h2 class="page-title" style="margin-bottom:0.3rem;">{{ user.get_full_name|default:user.username }}</h2>
+                <p class="page-subtitle" style="margin-bottom:1rem;">{{ user.email }}</p>
+                <a href="{% url 'passengers:edit_profile' %}" class="btn btn-outline btn-sm">Edit Profile</a>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-head">
+                <div class="panel-title">Profile Details</div>
+            </div>
+            <div class="panel-body">
+                <div class="info-item">
+                    <span class="info-label">Username</span>
+                    <span class="info-value">{{ user.username }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ user.email }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value">{{ user.phone_number|default:"Not provided" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Gender</span>
+                    <span class="info-value">{{ profile.get_gender_display|default:"Not provided" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Date of Birth</span>
+                    <span class="info-value">{{ profile.date_of_birth|default:"Not provided" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">City</span>
+                    <span class="info-value">{{ profile.city|default:"Not provided" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">State</span>
+                    <span class="info-value">{{ profile.state|default:"Not provided" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Member Since</span>
+                    <span class="info-value">{{ user.created_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="portal-footer-links">
+        <a href="{% url 'passengers:my_bookings' %}">My Bookings</a> &middot;
+        <a href="{% url 'passengers:wallet' %}">Wallet</a> &middot;
+        <a href="{% url 'passengers:dashboard' %}">Dashboard</a>
+    </div>
+</div>
+{% endblock %}

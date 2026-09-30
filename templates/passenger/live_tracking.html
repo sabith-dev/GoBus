@@ -1,0 +1,68 @@
+{% extends 'base_passenger.html' %}
+{% block title %}Live Tracking - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash" style="max-width: 1200px;">
+    <div class="page-header">
+        <div>
+            <h1>Live Tracking</h1>
+            <p class="page-subtitle">{{ bus.bus_name }} · {{ booking.schedule.route.origin }} → {{ booking.schedule.route.destination }}</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'passengers:booking_details' booking_id=booking.id %}" class="btn btn-outline">Booking Details</a>
+            <a href="{% url 'passengers:my_bookings' %}" class="btn btn-outline">My Bookings</a>
+        </div>
+    </div>
+
+    <div class="track-grid">
+        <div class="track-side">
+            <div class="panel-title" style="font-size:1rem; margin-bottom:1.1rem;">Trip Status</div>
+            <div class="track-info">
+                <div class="ti">
+                    <div class="k">Status</div>
+                    <div class="v">
+                        {% if tracking_available %}
+                            <span class="badge {% if is_on_time %}green{% else %}red{% endif %}">{{ is_on_time|yesno:'On Time,Delayed' }}</span>
+                        {% else %}
+                            <span class="badge blue">Tracking Not Active</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="ti">
+                    <div class="k">Current Stop</div>
+                    <div class="v" id="currentStop">{{ current_stop }}</div>
+                </div>
+                <div class="ti">
+                    <div class="k">Next Stop</div>
+                    <div class="v" id="nextStop">{{ next_stop }}</div>
+                </div>
+                <div class="ti">
+                    <div class="k">Estimated Arrival</div>
+                    <div class="v" id="eta">{{ eta }}</div>
+                </div>
+                <div class="ti">
+                    <div class="k">Speed</div>
+                    <div class="v" id="speed">{{ speed }} km/h</div>
+                </div>
+            </div>
+        </div>
+        <div class="track-map">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:56px; height:56px; margin:0 auto 0.75rem; display:block;">
+                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+            </svg>
+            {% if tracking_available %}
+                <p>Live location: {{ latitude }}, {{ longitude }}</p>
+            {% else %}
+                <p>Live tracking is not available for this bus yet. Checking again closer to departure.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const bookingId = {{ booking.id }};
+// WebSocket connection for live tracking
+// const ws = new WebSocket(`ws://${window.location.host}/ws/tracking/${bookingId}/`);
+</script>
+{% endblock %}

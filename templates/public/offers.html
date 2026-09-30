@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Offers - GoBus{% endblock %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/public.css' %}">{% endblock %}
+
+{% block content %}
+<section class="gb-page-hero">
+    <div class="container">
+        <h1>GoBus Offers</h1>
+        <p>Save big on every trip with promo codes and seasonal deals.</p>
+    </div>
+</section>
+<section class="gb-section">
+    <div class="container">
+        {% if offers %}
+        <div class="row g-4">
+            {% for offer in offers %}
+            <div class="col-lg-3 col-md-6">
+                <div class="gb-offer" style="background:linear-gradient(135deg, {% cycle '#3a3a9e' '#1f9d55' '#e66a00' '#b5179e' %}, #16163b);">
+                    <div>
+                        <div class="of-tagline"><i class="fas {{ offer.icon }} me-1"></i>{{ offer.tagline|default:offer.title }}</div>
+                        <div class="of-title">{{ offer.discount_label }}</div>
+                        <div class="of-code">{{ offer.code }}</div>
+                        <div class="mt-2" style="font-size:.85rem;opacity:.85;">
+                            {% if offer.min_booking_amount %}Min. booking ₹{{ offer.min_booking_amount }}{% endif %}
+                            {% if offer.valid_until %} &middot; till {{ offer.valid_until|date:"d M Y" }}{% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        <a class="text-white" style="font-weight:600;text-decoration:underline;" href="{% url 'core:search' %}">Book Now</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+            <h5 class="fw-bold">No active offers right now</h5>
+            <p class="text-muted">Check back soon for fresh deals.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "admin_portal/base_admin.html" %} {% block content %}
+
+<div class="admin-cities">
+  <h1>Cities & Routes</h1>
+  <p class="subtitle">Manage cities and bus routes</p>
+
+  <div class="grid-2">
+    <div class="cities-list">
+      <div class="section-title">Cities ({{ cities|length }})</div>
+      {% for city in cities %}
+      <div class="city-item">
+        <div>
+          <span class="name">{{ city.name }}</span>
+          <span class="state">{{ city.state }}</span>
+        </div>
+        <div>
+          {% if city.is_popular %}<span class="badge badge-pink">Popular</span
+          >{% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <p class="empty-state">No cities added yet</p>
+      {% endfor %}
+    </div>
+
+    <div class="add-form">
+      <h3>Add New City</h3>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_city" />
+        <div class="form-group">
+          <label for="city_name">City Name</label>
+          <input
+            type="text"
+            id="city_name"
+            name="name"
+            placeholder="e.g. Mumbai"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="city_state">State</label>
+          <input
+            type="text"
+            id="city_state"
+            name="state"
+            placeholder="e.g. Maharashtra"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Add City</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="section-title">Routes ({{ routes|length }})</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Origin</th>
+          <th>Destination</th>
+          <th>Distance</th>
+          <th>Stops</th>
+          <th>Active</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for route in routes %}
+        <tr>
+          <td><strong>{{ route.origin }}</strong></td>
+          <td><strong>{{ route.destination }}</strong></td>
+          <td>{{ route.distance_km|default:"—" }} km</td>
+          <td>{{ route.stops_count|default:"0" }}</td>
+          <td>
+            {% if route.is_active %}<span class="badge badge-green">Active</span>{% else %}<span class="badge badge-yellow">Inactive</span>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="empty-state">No routes defined</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

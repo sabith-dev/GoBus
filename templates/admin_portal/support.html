@@ -1,0 +1,203 @@
+{% extends "admin_portal/base_admin.html" %} {% block content %}
+
+<div class="admin-support">
+  <h1>Support & Complaints</h1>
+  <p class="subtitle">Handle customer support tickets and complaints</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(event, 'tab-tickets')">
+      Tickets
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-complaints')">
+      Complaints
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-refunds')">
+      Refund Requests
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-emergency')">
+      Emergency
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-chat')">Chat</button>
+  </div>
+
+  <div id="tab-tickets" class="tab-content active">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket ID</th>
+            <th>User</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ticket in tickets %}
+          <tr>
+            <td><strong>#{{ ticket.id }}</strong></td>
+            <td>{{ ticket.user.username }}</td>
+            <td>{{ ticket.subject }}</td>
+            <td>
+              <span
+                class="badge {% if ticket.status == 'open' %}badge-yellow{% elif ticket.status == 'resolved' %}badge-green{% else %}badge-pink{% endif %}"
+                >{{ ticket.status }}</span
+              >
+            </td>
+            <td>
+              <span
+                class="badge {% if ticket.priority == 'high' %}badge-red{% elif ticket.priority == 'medium' %}badge-yellow{% else %}badge-blue{% endif %}"
+                >{{ ticket.priority }}</span
+              >
+            </td>
+            <td>{{ ticket.created_at|date:"d M Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="empty-state">No tickets</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-complaints" class="tab-content">
+    {% for complaint in complaints %}
+    <div class="complaint-card">
+      <div class="complaint-header">
+        <h4>{{ complaint.subject }}</h4>
+        <span
+          class="badge {% if complaint.status == 'resolved' %}badge-green{% elif complaint.status == 'escalated' %}badge-red{% elif complaint.status == 'pending' %}badge-yellow{% else %}badge-pink{% endif %}"
+          >{{ complaint.status }}</span
+        >
+      </div>
+      <div class="complaint-meta">
+        <span>By: {{ complaint.user.username }}</span>
+        <span>Category: {{ complaint.category|default:"General" }}</span>
+        <span>{{ complaint.created_at|date:"d M Y" }}</span>
+      </div>
+      <div class="complaint-body">
+        {{ complaint.description|truncatewords:50 }}
+      </div>
+      <div class="complaint-actions">
+        {% if complaint.status != 'resolved' %}
+        <form method="post" class="inline-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="resolve" />
+          <input type="hidden" name="complaint_id" value="{{ complaint.id }}" />
+          <button class="btn btn-green btn-sm">Resolve</button>
+        </form>
+        <form method="post" class="inline-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="escalate" />
+          <input type="hidden" name="complaint_id" value="{{ complaint.id }}" />
+          <button class="btn btn-yellow btn-sm">Escalate</button>
+        </form>
+        {% endif %}
+        <form method="post" class="inline-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="refund" />
+          <input type="hidden" name="complaint_id" value="{{ complaint.id }}" />
+          <button class="btn btn-primary btn-sm">Refund</button>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <p class="empty-state">No complaints</p>
+    {% endfor %}
+  </div>
+
+  <div id="tab-refunds" class="tab-content">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Booking</th>
+            <th>Amount</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in refund_requests %}
+          <tr>
+            <td><strong>#{{ r.id }}</strong></td>
+            <td>{{ r.booking.passenger.username|default:"—" }}</td>
+            <td>#{{ r.booking.id }}</td>
+            <td>₹{{ r.amount }}</td>
+            <td>{{ r.reason|truncatewords:10 }}</td>
+            <td>
+              <span
+                class="badge {% if r.status == 'completed' or r.status == 'approved' %}badge-green{% elif r.status == 'pending' %}badge-yellow{% else %}badge-red{% endif %}"
+                >{{ r.status }}</span
+              >
+            </td>
+            <td>
+              {% if r.status == 'pending' %}
+              <form method="post" class="inline-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="approve_refund" />
+                <input type="hidden" name="refund_id" value="{{ r.id }}" />
+                <button class="btn btn-green btn-sm">Approve</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="empty-state">No refund requests</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-emergency" class="tab-content">
+    <div class="alert-banner">
+      <span class="icon">⚠️</span>
+      <span class="text"
+        >Emergency alerts and SOS requests from passengers and drivers</span
+      >
+    </div>
+    {% for alert in emergency_alerts %}
+    <div class="complaint-card danger">
+      <div class="complaint-header">
+        <h4>{{ alert.title }}</h4>
+        <span class="badge badge-red">{{ alert.priority }}</span>
+      </div>
+      <div class="complaint-meta">
+        <span>By: {{ alert.user.username }}</span>
+        <span>Location: {{ alert.location|default:"Unknown" }}</span>
+        <span>{{ alert.created_at|date:"d M Y H:i" }}</span>
+      </div>
+      <div class="complaint-body">{{ alert.description }}</div>
+    </div>
+    {% empty %}
+    <p class="empty-state">No emergency alerts</p>
+    {% endfor %}
+  </div>
+
+  <div id="tab-chat" class="tab-content">
+    <p class="empty-state">Live chat management — Coming soon</p>
+  </div>
+</div>
+
+<script>
+  function switchTab(e, tabId) {
+    document
+      .querySelectorAll(".tab-btn")
+      .forEach((b) => b.classList.remove("active"));
+    document
+      .querySelectorAll(".tab-content")
+      .forEach((c) => c.classList.remove("active"));
+    e.target.classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% load static %}
+{% if not user.is_authenticated and request.resolver_match.namespace == 'accounts' %}
+<nav class="navbar gb-navbar gb-navbar-auth">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'core:home' %}">
+            <i class="fas fa-bus me-2"></i>GoBus
+        </a>
+    </div>
+</nav>
+{% else %}
+<div class="gb-topbar">
+    <div class="container">
+        <span><i class="fas fa-phone me-1"></i> 1800-XXX-XXXX &nbsp;|&nbsp; <i class="fas fa-envelope me-1"></i> support@gobus.com</span>
+    </div>
+</div>
+<nav class="navbar navbar-expand-lg gb-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'core:home' %}">
+            <i class="fas fa-bus me-2"></i>GoBus
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#gbNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="gbNav">
+            {% if user.is_authenticated %}
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_passenger %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'passengers:dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'passengers:search' %}"><i class="fas fa-search me-1"></i>Search</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'passengers:my_bookings' %}"><i class="fas fa-ticket me-1"></i>My Bookings</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>{{ user.first_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'passengers:profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'passengers:wallet' %}"><i class="fas fa-wallet me-2"></i>Wallet</a></li>
+                                <li><a class="dropdown-item" href="{% url 'notifications:notification_list' %}"><i class="fas fa-bell me-2"></i>Notifications</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    {% elif user.is_agency %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'agencies:dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'agencies:bus_list' %}"><i class="fas fa-bus me-1"></i>Buses</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'agencies:route_list' %}"><i class="fas fa-route me-1"></i>Routes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'agencies:schedule_list' %}"><i class="fas fa-calendar me-1"></i>Schedules</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>{{ user.first_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'agencies:profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'agencies:earnings' %}"><i class="fas fa-dollar-sign me-2"></i>Earnings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"><i class="fas fa-user-shield me-1"></i>Admin</a></li>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'core:home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/about/' %}active{% endif %}" href="{% url 'core:about' %}">About</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/features/' %}active{% endif %}" href="{% url 'core:features' %}">Features</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/offers/' %}active{% endif %}" href="{% url 'core:offers' %}">Offers</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Help</a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'core:faq' %}"><i class="fas fa-question-circle me-2"></i>FAQ</a></li>
+                            <li><a class="dropdown-item" href="{% url 'core:contact' %}"><i class="fas fa-phone me-2"></i>Contact</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="gb-btn-outline" href="{% url 'accounts:login' %}">Login</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="gb-btn-solid" href="{% url 'accounts:register' %}">Register</a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+{% endif %}

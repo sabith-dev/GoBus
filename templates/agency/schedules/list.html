@@ -1,0 +1,64 @@
+{% extends 'base_agency.html' %}
+{% block title %}Schedules - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Schedules</h1>
+            <p class="page-subtitle">Set departure times for your routes.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:schedule_add' %}" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Schedule
+            </a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Route</th>
+                        <th>Departure</th>
+                        <th>Arrival</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                    <tr>
+                        <td>
+                            <div class="cell-main">{{ schedule.route.origin }} → {{ schedule.route.destination }}</div>
+                            <div class="cell-sub">{{ schedule.bus.bus_name }} · {{ schedule.bus.bus_number }}</div>
+                        </td>
+                        <td>{{ schedule.departure_time|time:"h:i A" }}</td>
+                        <td>{{ schedule.arrival_time|time:"h:i A" }}</td>
+                        <td>
+                            <span class="badge {% if schedule.is_active %}green{% else %}blue{% endif %}">{{ schedule.is_active|yesno:'Active,Inactive' }}</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons" style="justify-content:flex-start;">
+                                <a href="{% url 'agencies:schedule_edit' schedule_id=schedule.id %}" class="btn btn-outline btn-sm">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <p>No schedules yet. Add one to start selling seats.</p>
+                                <a href="{% url 'agencies:schedule_add' %}" class="btn btn-primary btn-sm">Add Schedule</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

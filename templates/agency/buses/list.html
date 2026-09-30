@@ -1,0 +1,66 @@
+{% extends 'base_agency.html' %}
+{% block title %}My Buses - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>My Buses</h1>
+            <p class="page-subtitle">Manage the buses in your fleet.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:bus_add' %}" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Bus
+            </a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Bus</th>
+                        <th>Registration</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bus in buses %}
+                    <tr>
+                        <td>
+                            <div class="cell-main">{{ bus.bus_name }}</div>
+                            <div class="cell-sub">{{ bus.bus_type }}</div>
+                        </td>
+                        <td>{{ bus.bus_number }}</td>
+                        <td>{{ bus.total_seats }} seats</td>
+                        <td>
+                            <span class="badge {% if bus.status == 'active' %}green{% elif bus.status == 'inactive' %}blue{% else %}yellow{% endif %}">{{ bus.get_status_display }}</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons" style="justify-content:flex-start;">
+                                <a href="{% url 'agencies:bus_details' bus_id=bus.id %}" class="btn btn-outline btn-sm">View</a>
+                                <a href="{% url 'agencies:bus_edit' bus_id=bus.id %}" class="btn btn-outline btn-sm">Edit</a>
+                                <a href="{% url 'agencies:bus_seats' bus_id=bus.id %}" class="btn btn-outline btn-sm">Seats</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                <p>No buses added yet. Add your first bus to start selling tickets.</p>
+                                <a href="{% url 'agencies:bus_add' %}" class="btn btn-primary btn-sm">Add Your First Bus</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base_passenger.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Reviews - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Reviews</h1>
+            <p class="page-subtitle">Rate your travel experience.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'passengers:my_bookings' %}" class="btn btn-outline">My Bookings</a>
+        </div>
+    </div>
+
+    {% if eligible_booking %}
+    <div class="panel-card" style="max-width: 720px; margin-bottom: 1.5rem;">
+        <div class="panel-head">
+            <div class="panel-title">Review your trip</div>
+        </div>
+        <div class="panel-body">
+            <p class="page-subtitle" style="margin-bottom:1rem;">You recently travelled on {{ eligible_booking.schedule.bus.bus_name }} ({{ eligible_booking.schedule.route }}). Share your experience!</p>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="booking_id" value="{{ eligible_booking.id }}">
+                {{ form|crispy }}
+                <div class="action-buttons" style="margin-top:1.25rem;">
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="panel-card">
+        <div class="panel-head">
+            <div class="panel-title">Your Reviews</div>
+        </div>
+        <div class="panel-body">
+            {% for review in reviews %}
+            <div class="notification-item">
+                <div class="noc-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <div class="noc-body">
+                    <div class="noc-title">{{ review.title|default:review.bus.bus_name }} <span class="badge yellow" style="margin-left:0.4rem;">★ {{ review.rating }}/5</span></div>
+                    <div class="noc-text">{{ review.comment }}</div>
+                    <div class="noc-meta">{{ review.bus.bus_name }} · {{ review.created_at|date:'d M Y' }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <p>No reviews yet. Complete a trip to leave a review.</p>
+                <a href="{% url 'passengers:search' %}" class="btn btn-primary btn-sm">Plan a Trip</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

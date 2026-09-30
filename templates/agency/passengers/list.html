@@ -1,0 +1,57 @@
+{% extends 'base_agency.html' %}
+{% block title %}Passengers - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Passengers</h1>
+            <p class="page-subtitle">People who have travelled with your agency.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:booking_list' %}" class="btn btn-outline">View Bookings</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Passenger</th>
+                        <th>Email</th>
+                        <th>Trips</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in passengers %}
+                    <tr>
+                        <td>
+                            <div class="cell-main">{{ p.get_full_name|default:p.username }}</div>
+                            <div class="cell-sub">@{{ p.username }}</div>
+                        </td>
+                        <td>{{ p.email|default:'—' }}</td>
+                        <td>{{ p.bookings.count }}</td>
+                        <td><span class="badge {% if p.is_active %}green{% else %}blue{% endif %}">{{ p.is_active|yesno:'Active,Inactive' }}</span></td>
+                        <td>
+                            <a href="{% url 'agencies:passenger_details' passenger_id=p.id %}" class="btn btn-outline btn-sm">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                                <p>No passengers yet. Passengers appear here after booking a trip.</p>
+                                <a href="{% url 'agencies:booking_list' %}" class="btn btn-primary btn-sm">View Bookings</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

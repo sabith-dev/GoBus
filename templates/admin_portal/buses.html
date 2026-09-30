@@ -1,0 +1,147 @@
+{% extends "admin_portal/base_admin.html" %} {% block content %}
+
+<div class="admin-buses">
+  <h1>Bus Management</h1>
+  <p class="subtitle">Manage all buses across agencies</p>
+
+  <div class="filter-tabs">
+    <a
+      href="?status=all"
+      class="filter-tab {% if not status_filter or status_filter == 'all' %}active{% endif %}"
+      >All</a
+    >
+    <a
+      href="?status=active"
+      class="filter-tab {% if status_filter == 'active' %}active{% endif %}"
+      >Active</a
+    >
+    <a
+      href="?status=pending"
+      class="filter-tab {% if status_filter == 'pending' %}active{% endif %}"
+      >Pending</a
+    >
+    <a
+      href="?status=rejected"
+      class="filter-tab {% if status_filter == 'rejected' %}active{% endif %}"
+      >Rejected</a
+    >
+  </div>
+
+  <form method="post" id="bulkForm">
+    {% csrf_token %}
+    <div class="toolbar">
+      <div class="bulk-bar" id="bulkBar">
+        <label>
+          <input type="checkbox" id="selectAll" /> Select All
+        </label>
+        <select name="bulk_action">
+          <option value="">Bulk Actions</option>
+          <option value="approve">Approve</option>
+          <option value="reject">Reject</option>
+          <option value="feature">Feature</option>
+          <option value="premium">Set Premium</option>
+        </select>
+        <button
+          type="submit"
+          class="btn btn-primary btn-sm"
+          onclick="return confirm('Apply to selected buses?');"
+        >
+          Apply
+        </button>
+      </div>
+    </div>
+
+    <p class="count-info">Showing {{ buses|length }} buses</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 40px">
+              <input type="checkbox" id="selectAllHead" />
+            </th>
+            <th>Bus Number</th>
+            <th>Agency</th>
+            <th>Type</th>
+            <th>Route</th>
+            <th>Seats</th>
+            <th>Status</th>
+            <th>Featured</th>
+            <th>Premium</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for bus in buses %}
+          <tr>
+            <td>
+              <input
+                type="checkbox"
+                name="selected_buses"
+                value="{{ bus.id }}"
+                class="bus-check"
+              />
+            </td>
+            <td><strong>{{ bus.bus_number }}</strong></td>
+            <td>{{ bus.agency.agency_profile.agency_name|default:bus.agency.username }}</td>
+            <td>{{ bus.bus_type }}</td>
+            <td>{{ bus.route.origin|default:"—" }} → {{ bus.route.destination|default:"—" }}</td>
+            <td>{{ bus.total_seats }}</td>
+            <td>
+              {% if bus.status == 'active' %}<span class="badge badge-green"
+                >Active</span
+              >
+              {% elif bus.status == 'pending' %}<span class="badge badge-yellow"
+                >Pending</span
+              >
+              {% elif bus.status == 'rejected' %}<span class="badge badge-red"
+                >Rejected</span
+              >
+              {% else %}
+              <span class="badge badge-pink">{{ bus.status }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if bus.is_featured %}<span class="badge badge-purple"
+                >★ Featured</span
+              >{% else %}<span class="muted">—</span>{% endif %}
+            </td>
+            <td>
+              {% if bus.is_premium %}<span class="badge badge-blue"
+                >Premium</span
+              >{% else %}<span class="muted">—</span>{% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="empty-state">No buses found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+</div>
+
+<script>
+  document
+    .getElementById("selectAllHead")
+    ?.addEventListener("change", function () {
+      document
+        .querySelectorAll(".bus-check")
+        .forEach((c) => (c.checked = this.checked));
+      document
+        .getElementById("bulkBar")
+        .classList.toggle("active", this.checked);
+    });
+  document.querySelectorAll(".bus-check").forEach((c) =>
+    c.addEventListener("change", function () {
+      document
+        .getElementById("bulkBar")
+        .classList.toggle(
+          "active",
+          document.querySelectorAll(".bus-check:checked").length > 0,
+        );
+    }),
+  );
+</script>
+{% endblock %}

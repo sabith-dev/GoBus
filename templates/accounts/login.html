@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{% if user_type == 'passenger' %}Passenger Login{% elif user_type == 'agency' %}Agency Login{% else %}Login{% endif %} - GoBus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/authentication.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-head">
+            <div class="auth-emblem"><i class="fas fa-bus"></i></div>
+            {% if user_type == 'passenger' %}
+                <h1 class="auth-title">Passenger Login</h1>
+                <p class="auth-sub">Sign in to book and track your journeys</p>
+            {% elif user_type == 'agency' %}
+                <h1 class="auth-title">Agency Login</h1>
+                <p class="auth-sub">Manage your buses, schedules &amp; bookings</p>
+            {% else %}
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-sub">Login to your GoBus account</p>
+            {% endif %}
+        </div>
+
+        <div class="auth-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+            </form>
+        </div>
+
+        <div class="auth-foot">
+            {% if user_type == 'agency' %}
+                <p class="mb-2"><a href="{% url 'accounts:forgot_password' %}">Forgot Password?</a></p>
+                <p class="mb-0"><a href="{% url 'core:home' %}">Back to Home</a></p>
+            {% else %}
+                <p class="mb-2"><a href="{% url 'accounts:forgot_password' %}">Forgot Password?</a></p>
+                <p class="mb-0">Don't have an account? <a href="{% url 'accounts:register' %}">Register</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

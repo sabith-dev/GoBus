@@ -1,0 +1,163 @@
+{% extends 'base_agency.html' %}
+{% block title %}Agency Dashboard - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p class="page-subtitle">Welcome back, {{ user.get_full_name|default:user.username }} — here's your agency at a glance.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:bus_add' %}" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Bus
+            </a>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card rose">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <span class="label">Total Buses</span>
+            <span class="value">{{ buses_count }}</span>
+            <span class="trend">{{ buses_count|pluralize:"bus" }} in fleet</span>
+        </div>
+        <div class="stat-card blue">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 000-7h-11a3.5 3.5 0 010-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+            </div>
+            <span class="label">Active Routes</span>
+            <span class="value">{{ routes_count }}</span>
+            <span class="trend">{{ schedules_count }} schedules active</span>
+        </div>
+        <div class="stat-card green">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <span class="label">Today's Bookings</span>
+            <span class="value">{{ today_bookings }}</span>
+            <span class="trend">{{ pending_bookings }} pending, {{ confirmed_bookings }} confirmed</span>
+        </div>
+        <div class="stat-card yellow">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <span class="label">Today's Earnings</span>
+            <span class="value">₹{{ today_earnings|floatformat:0 }}</span>
+            <span class="trend">₹{{ week_earnings|floatformat:0 }} this week</span>
+        </div>
+    </div>
+
+    <h2 class="page-title" style="margin-top:2rem;">Quick Actions</h2>
+    <div class="quick-grid">
+        <a href="{% url 'agencies:bus_list' %}" class="quick-link">
+            <div class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <span class="qtitle">Manage Buses</span>
+            <p class="qdesc">Add, edit or view the buses in your fleet.</p>
+        </a>
+        <a href="{% url 'agencies:route_list' %}" class="quick-link">
+            <div class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 000-7h-11a3.5 3.5 0 010-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+            </div>
+            <span class="qtitle">Routes</span>
+            <p class="qdesc">Define where your buses travel.</p>
+        </a>
+        <a href="{% url 'agencies:schedule_list' %}" class="quick-link">
+            <div class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <span class="qtitle">Schedules</span>
+            <p class="qdesc">Set departure times for your routes.</p>
+        </a>
+        <a href="{% url 'agencies:booking_list' %}" class="quick-link">
+            <div class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <span class="qtitle">Bookings</span>
+            <p class="qdesc">Track and manage passenger bookings.</p>
+        </a>
+        <a href="{% url 'agencies:passenger_list' %}" class="quick-link">
+            <div class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <span class="qtitle">Passengers</span>
+            <p class="qdesc">See who is travelling with you.</p>
+        </a>
+        <a href="{% url 'agencies:earnings' %}" class="quick-link">
+            <div class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <span class="qtitle">Earnings</span>
+            <p class="qdesc">Review revenue from your trips.</p>
+        </a>
+        <a href="{% url 'agencies:review_list' %}" class="quick-link">
+            <div class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <span class="qtitle">Reviews</span>
+            <p class="qdesc">See what passengers say about you.</p>
+        </a>
+        <a href="{% url 'agencies:notifications' %}" class="quick-link">
+            <div class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            </div>
+            <span class="qtitle">Notifications</span>
+            <p class="qdesc">Stay up to date with important alerts.</p>
+        </a>
+    </div>
+
+    {% if recent_bookings %}
+    <div class="panel-card" style="margin-top:2rem;">
+        <div class="panel-head">
+            <div class="panel-title">Recent Bookings</div>
+            <a href="{% url 'agencies:booking_list' %}" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Passenger</th>
+                        <th>Route</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in recent_bookings %}
+                    <tr>
+                        <td>{{ b.passenger_name }}</td>
+                        <td>{{ b.schedule.route }}</td>
+                        <td>{{ b.travel_date|date:'d M Y' }}</td>
+                        <td>₹{{ b.final_amount|floatformat:2 }}</td>
+                        <td><span class="badge {% if b.status == 'confirmed' %}green{% elif b.status == 'pending' %}yellow{% elif b.status == 'cancelled' %}red{% else %}blue{% endif %}">{{ b.get_status_display }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="panel-card" style="margin-top:2rem;">
+        <div class="panel-head">
+            <div class="panel-title">Get Started</div>
+        </div>
+        <div class="panel-body">
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <p>Set up your fleet to start taking bookings.</p>
+                <div class="action-buttons">
+                    <a href="{% url 'agencies:bus_add' %}" class="btn btn-outline btn-sm">Add a Bus</a>
+                    <a href="{% url 'agencies:route_add' %}" class="btn btn-outline btn-sm">Create a Route</a>
+                    <a href="{% url 'agencies:schedule_add' %}" class="btn btn-outline btn-sm">Add a Schedule</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

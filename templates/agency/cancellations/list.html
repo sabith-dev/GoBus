@@ -1,0 +1,54 @@
+{% extends 'base_agency.html' %}
+{% block title %}Cancellations - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Cancellations</h1>
+            <p class="page-subtitle">Track cancelled bookings and refunds.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:booking_list' %}" class="btn btn-outline">View Bookings</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Passenger</th>
+                        <th>Amount Refunded</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in cancellations %}
+                    <tr>
+                        <td>{{ c.booking.booking_id|truncatechars:10 }}</td>
+                        <td>{{ c.booking.passenger_name }}</td>
+                        <td>₹{{ c.refund_amount|floatformat:2 }}</td>
+                        <td>{{ c.cancelled_at|date:'d M Y' }}</td>
+                        <td>
+                            <span class="badge {% if c.status == 'refunded' %}green{% elif c.status == 'approved' %}blue{% elif c.status == 'rejected' %}red{% else %}yellow{% endif %}">{{ c.get_status_display }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                <p>No cancellations yet. Everything is running smoothly.</p>
+                                <a href="{% url 'agencies:booking_list' %}" class="btn btn-primary btn-sm">View Bookings</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

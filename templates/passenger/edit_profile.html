@@ -1,0 +1,41 @@
+{% extends 'base_passenger.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Edit Profile - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Edit Profile</h1>
+            <p class="page-subtitle">Update your personal details.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'passengers:profile' %}" class="btn btn-outline">View Profile</a>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="panel-card" style="max-width: 760px; margin-bottom:1.5rem;">
+            <div class="panel-head">
+                <div class="panel-title">Account Information</div>
+            </div>
+            <div class="panel-body">
+                {{ user_form|crispy }}
+            </div>
+        </div>
+
+        <div class="panel-card" style="max-width: 760px;">
+            <div class="panel-head">
+                <div class="panel-title">Personal Information</div>
+            </div>
+            <div class="panel-body">
+                {{ profile_form|crispy }}
+                <div class="action-buttons" style="margin-top:1.25rem;">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{% url 'passengers:profile' %}" class="btn btn-outline">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

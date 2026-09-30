@@ -1,0 +1,56 @@
+{% extends 'base_passenger.html' %}
+{% block title %}Cancellations - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Cancellations</h1>
+            <p class="page-subtitle">Track your cancelled bookings and refunds.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'passengers:my_bookings' %}" class="btn btn-outline">My Bookings</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Journey</th>
+                        <th>Refunded</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in cancellations %}
+                    <tr>
+                        <td>{{ c.booking.booking_id|truncatechars:10 }}</td>
+                        <td>{{ c.booking.schedule.route }}</td>
+                        <td>₹{{ c.refund_amount|floatformat:2 }}</td>
+                        <td>
+                            <span class="badge {% if c.status == 'refunded' %}green{% elif c.status == 'approved' %}blue{% elif c.status == 'rejected' %}red{% else %}yellow{% endif %}">{{ c.get_status_display }}</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'passengers:booking_details' booking_id=c.booking.id %}" class="btn btn-outline btn-sm">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                <p>No cancellations yet. All your trips are on track.</p>
+                                <a href="{% url 'passengers:search' %}" class="btn btn-primary btn-sm">Book a Trip</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

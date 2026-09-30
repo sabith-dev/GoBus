@@ -1,0 +1,61 @@
+{% extends 'base_agency.html' %}
+{% block title %}Bookings - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Bookings</h1>
+            <p class="page-subtitle">Track all bookings made on your buses.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:schedule_list' %}" class="btn btn-outline">View Schedules</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Passenger</th>
+                        <th>Route</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.booking_id|truncatechars:10 }}</td>
+                        <td>
+                            <div class="cell-main">{{ booking.passenger_name }}</div>
+                            <div class="cell-sub">{{ booking.passenger_phone|default:'' }}</div>
+                        </td>
+                        <td>{{ booking.schedule.route.origin }} → {{ booking.schedule.route.destination }}</td>
+                        <td>{{ booking.travel_date|date:'d M Y' }}</td>
+                        <td>
+                            <span class="badge {% if booking.status == 'confirmed' %}green{% elif booking.status == 'pending' %}yellow{% elif booking.status == 'cancelled' %}red{% else %}blue{% endif %}">{{ booking.get_status_display }}</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'agencies:booking_details' booking_id=booking.id %}" class="btn btn-outline btn-sm">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                                <p>No bookings yet. Bookings will appear here as passengers buy seats.</p>
+                                <a href="{% url 'agencies:schedule_add' %}" class="btn btn-primary btn-sm">Add a Schedule</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

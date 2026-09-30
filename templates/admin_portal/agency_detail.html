@@ -1,0 +1,393 @@
+{% extends "admin_portal/base_admin.html" %}
+{% load static %}
+
+{% block title %}{{ agency.agency_name }} - Agency Detail{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{% url 'admin_portal:agencies' %}">Agencies</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current">{{ agency.agency_name }}</span>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">{{ agency.agency_name }}</h1>
+            <p class="page-subtitle">Agency Management & Details</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'accounts:agency_login' %}" target="_blank" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Open Agent Portal
+            </a>
+            {% if not agency.is_approved %}
+            <form method="post" action="{% url 'admin_portal:agency_detail' pk=agency.pk %}" class="inline-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="approve">
+                <button type="submit" class="btn btn-success">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Approve Agency
+                </button>
+            </form>
+            {% endif %}
+
+            {% if agency.is_blacklisted %}
+            <form method="post" action="{% url 'admin_portal:agency_detail' pk=agency.pk %}" class="inline-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="unblacklist">
+                <button type="submit" class="btn btn-success">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M9 12l2 2 4-4"/></svg>
+                    Unblacklist
+                </button>
+            </form>
+            {% else %}
+            <form method="post" action="{% url 'admin_portal:agency_detail' pk=agency.pk %}" class="inline-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="blacklist">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to blacklist this agency?');">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                    Blacklist
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Agency Info Card -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Agency Information
+            </h2>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                {% if agency.is_approved %}
+                <span class="badge badge-success">
+                    <span class="status-dot active"></span> Approved
+                </span>
+                {% else %}
+                <span class="badge badge-warning">
+                    <span class="status-dot inactive"></span> Pending Approval
+                </span>
+                {% endif %}
+
+                {% if agency.is_blacklisted %}
+                <span class="badge badge-danger">
+                    <span class="status-dot inactive"></span> Blacklisted
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="agency-info-grid">
+                <div class="info-item">
+                    <span class="info-label">Agency Name</span>
+                    <span class="info-value">{{ agency.agency_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Description</span>
+                    <span class="info-value">{{ agency.description|default:"No description provided" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Owner</span>
+                    <span class="info-value">{{ agency.user.username }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">City</span>
+                    <span class="info-value">{{ agency.city|default:"Not specified" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Total Revenue</span>
+                    <span class="info-value highlight">₹{{ agency.total_revenue|floatformat:2 }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Rating</span>
+                    <span class="info-value">
+                        {% if agency.rating %}
+                        <span style="color: #F59E0B;">&#9733;</span> {{ agency.rating|floatformat:1 }}/5.0
+                        {% else %}
+                        No ratings yet
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Commission Rate</span>
+                    <span class="info-value">{{ agency.commission_rate|floatformat:1 }}%</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Status</span>
+                    <span class="info-value">
+                        {% if agency.is_approved %}
+                            <span class="badge badge-success"><span class="status-dot active"></span> Active</span>
+                        {% elif agency.is_blacklisted %}
+                            <span class="badge badge-danger"><span class="status-dot inactive"></span> Blacklisted</span>
+                        {% else %}
+                            <span class="badge badge-warning"><span class="status-dot inactive"></span> Pending</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KYC Documents Section -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                KYC Documents
+            </h2>
+            <span class="badge badge-info">{{ kyc_documents|length }} Document{{ kyc_documents|length|pluralize }}</span>
+        </div>
+        <div class="card-body">
+            {% if kyc_documents %}
+            <div class="kyc-list">
+                {% for doc in kyc_documents %}
+                <div class="kyc-item">
+                    <div class="kyc-info">
+                        <span class="kyc-name">{{ doc.name }}</span>
+                        <span class="kyc-detail">{{ doc.detail|default:"No additional details" }}</span>
+                    </div>
+                    <div>
+                        {% if doc.status == "approved" or doc.status == "verified" %}
+                        <span class="badge badge-success">
+                            <span class="status-dot active"></span> {{ doc.status|title }}
+                        </span>
+                        {% elif doc.status == "rejected" %}
+                        <span class="badge badge-danger">
+                            <span class="status-dot inactive"></span> {{ doc.status|title }}
+                        </span>
+                        {% elif doc.status == "pending" %}
+                        <span class="badge badge-warning">
+                            <span class="status-dot inactive"></span> {{ doc.status|title }}
+                        </span>
+                        {% else %}
+                        <span class="badge badge-gray">{{ doc.status|title }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-data">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <p>No KYC documents submitted yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <div class="tabs-container">
+        <div class="card" style="margin-bottom: 0;">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" onclick="switchTab('buses')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline; vertical-align:middle; margin-right:4px;"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 21v-4"/><path d="M17 21v-4"/></svg>
+                    Buses ({{ buses|length }})
+                </button>
+                <button class="tab-btn" onclick="switchTab('drivers')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline; vertical-align:middle; margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Drivers ({{ drivers|length }})
+                </button>
+                <button class="tab-btn" onclick="switchTab('bookings')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline; vertical-align:middle; margin-right:4px;"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/></svg>
+                    Bookings ({{ bookings|length }})
+                </button>
+            </nav>
+
+            <div class="card-body">
+                <!-- Buses Tab -->
+                <div id="tab-buses" class="tab-content active">
+                    {% if buses %}
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Bus Number</th>
+                                    <th>Bus Type</th>
+                                    <th>Route</th>
+                                    <th>Total Seats</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bus in buses %}
+                                <tr>
+                                    <td style="font-weight: 600; color: var(--color-foreground);">{{ bus.bus_number }}</td>
+                                    <td>{{ bus.bus_type }}</td>
+                                    <td>{{ bus.route|default:"-" }}</td>
+                                    <td>{{ bus.total_seats }}</td>
+                                    <td>
+                                        {% if bus.status == "active" or bus.status == "available" %}
+                                        <span class="badge badge-success"><span class="status-dot active"></span> {{ bus.status|title }}</span>
+                                        {% elif bus.status == "maintenance" %}
+                                        <span class="badge badge-warning"><span class="status-dot inactive"></span> {{ bus.status|title }}</span>
+                                        {% elif bus.status == "inactive" %}
+                                        <span class="badge badge-danger"><span class="status-dot inactive"></span> {{ bus.status|title }}</span>
+                                        {% else %}
+                                        <span class="badge badge-gray">{{ bus.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="no-data">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 21v-4"/><path d="M17 21v-4"/></svg>
+                        <p>No buses registered under this agency.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Drivers Tab -->
+                <div id="tab-drivers" class="tab-content">
+                    {% if drivers %}
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>License Number</th>
+                                    <th>On Duty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for driver in drivers %}
+                                <tr>
+                                    <td style="font-weight: 600; color: var(--color-foreground);">{{ driver.name }}</td>
+                                    <td>{{ driver.phone|default:"-" }}</td>
+                                    <td>{{ driver.license_number }}</td>
+                                    <td>
+                                        {% if driver.is_on_duty %}
+                                        <span class="badge badge-success"><span class="status-dot active"></span> On Duty</span>
+                                        {% else %}
+                                        <span class="badge badge-gray"><span class="status-dot inactive"></span> Off Duty</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="no-data">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <p>No drivers registered under this agency.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Bookings Tab -->
+                <div id="tab-bookings" class="tab-content">
+                    {% if bookings %}
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>User</th>
+                                    <th>Route</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Booked At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td style="font-weight: 600; color: var(--color-foreground);">#{{ booking.id }}</td>
+                                    <td>{{ booking.user.username }}</td>
+                                    <td>{{ booking.route|default:"-" }}</td>
+                                    <td style="font-weight: 600; color: var(--color-primary);">₹{{ booking.final_amount|floatformat:2 }}</td>
+                                    <td>
+                                        {% if booking.status == "confirmed" or booking.status == "completed" %}
+                                        <span class="badge badge-success"><span class="status-dot active"></span> {{ booking.status|title }}</span>
+                                        {% elif booking.status == "cancelled" %}
+                                        <span class="badge badge-danger"><span class="status-dot inactive"></span> {{ booking.status|title }}</span>
+                                        {% elif booking.status == "pending" %}
+                                        <span class="badge badge-warning"><span class="status-dot inactive"></span> {{ booking.status|title }}</span>
+                                        {% else %}
+                                        <span class="badge badge-gray">{{ booking.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ booking.booked_at|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="no-data">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/></svg>
+                        <p>No bookings found for this agency.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commission Form -->
+    <div class="card commission-form">
+        <div class="card-header">
+            <h2 class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Commission Settings
+            </h2>
+            <span class="badge badge-info">Current: {{ agency.commission_rate|floatformat:1 }}%</span>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{% url 'admin_portal:agency_detail' pk=agency.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="set_commission">
+                <div class="form-group" style="max-width: 400px;">
+                    <label class="form-label" for="commission_rate">Commission Rate (%)</label>
+                    <div class="form-row">
+                        <input
+                            type="number"
+                            id="commission_rate"
+                            name="commission_rate"
+                            class="form-input"
+                            value="{{ agency.commission_rate|floatformat:1 }}"
+                            min="0"
+                            max="100"
+                            step="0.1"
+                            placeholder="e.g. 12.5"
+                            required
+                        >
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Update Commission
+                        </button>
+                    </div>
+                    <span class="form-hint">Set the percentage commission this agency earns on each booking. Range: 0% - 100%.</span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(function(content) {
+            content.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+
+        var tabContent = document.getElementById('tab-' + tabName);
+        if (tabContent) {
+            tabContent.classList.add('active');
+        }
+
+        event.currentTarget.classList.add('active');
+    }
+</script>
+{% endblock %}

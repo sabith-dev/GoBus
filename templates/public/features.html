@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Features - GoBus{% endblock %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/public.css' %}">{% endblock %}
+
+{% block content %}
+<section class="gb-page-hero">
+    <div class="container">
+        <h1>Features</h1>
+        <p>Everything you need for a smooth, safe and smart bus journey — in one place.</p>
+    </div>
+</section>
+<section class="gb-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-lock"></i></div><h6>Secure Booking</h6><p>Protected user accounts and a fully encrypted booking flow end to end.</p></div></div>
+            <div class="col-lg-4 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-couch"></i></div><h6>Choose Your Seat</h6><p>Pick your preferred seat on an interactive, live bus layout.</p></div></div>
+            <div class="col-lg-4 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-credit-card"></i></div><h6>Easy Payments</h6><p>UPI, cards, net banking and GoBus wallet with one-tap checkout.</p></div></div>
+            <div class="col-lg-4 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-ticket-alt"></i></div><h6>Digital Ticket</h6><p>Instant e-ticket with a QR code — scan and board, no printout needed.</p></div></div>
+            <div class="col-lg-4 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-map-marker-alt"></i></div><h6>Live Bus Tracking</h6><p>Follow your bus in real time with live location and ETA updates.</p></div></div>
+            <div class="col-lg-4 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-bell"></i></div><h6>Smart Notifications</h6><p>Alerts for booking, payment, cancellation, reminders and new offers.</p></div></div>
+            <div class="col-lg-4 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-star"></i></div><h6>Verified Reviews</h6><p>Real ratings from verified passengers to help you choose better.</p></div></div>
+            <div class="col-lg-4 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-wallet"></i></div><h6>Wallet &amp; Rewards</h6><p>Earn cashback and referral rewards with every booking.</p></div></div>
+            <div class="col-lg-4 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-robot"></i></div><h6>GoBus AI Assistant</h6><p>Ask our assistant to find buses, check bookings and answer travel questions.</p></div></div>
+        </div>
+    </div>
+</section>
+{% endblock %}

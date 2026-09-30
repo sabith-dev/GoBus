@@ -1,0 +1,103 @@
+{% extends 'base_passenger.html' %}
+{% block title %}Bus Details - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="breadcrumb">
+        <a href="{% url 'passengers:search' %}">Search</a>
+        <span class="separator">/</span>
+        <a href="{% url 'passengers:bus_results' %}">Results</a>
+        <span class="separator">/</span>
+        <span class="current">Bus Details</span>
+    </div>
+
+    <div class="page-header">
+        <div>
+            <h1>Bus Details</h1>
+            <p class="page-subtitle">{{ bus.bus_name }} · {{ bus.bus_number }}</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'passengers:bus_results' %}" class="btn btn-outline">Back to Results</a>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items:start;">
+        <div class="panel-card">
+            <div class="panel-head">
+                <div class="panel-title">Bus Information</div>
+            </div>
+            <div class="panel-body">
+                <div class="info-item">
+                    <span class="info-label">Bus Name</span>
+                    <span class="info-value">{{ bus.bus_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Registration</span>
+                    <span class="info-value">{{ bus.bus_number }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Operator</span>
+                    <span class="info-value">{{ bus.agency.get_full_name|default:bus.agency.username }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Bus Type</span>
+                    <span class="info-value">{{ bus.bus_type|default:'—' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Amenities</span>
+                    <span class="info-value">
+                        {% if bus.bus_type %}
+                            {% for a in bus.bus_type.amenities %}<span class="badge blue">{{ a }}</span> {% empty %}—{% endfor %}
+                        {% else %}—{% endif %}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Rating</span>
+                    <span class="info-value highlight">{% if rating %}★ {{ rating }}{% else %}No ratings yet{% endif %}{% if review_count %} <span style="color:var(--color-muted); font-weight:400;">({{ review_count }} reviews)</span>{% endif %}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-head">
+                <div class="panel-title">Available Schedules</div>
+            </div>
+            <div class="panel-body">
+                {% for s in schedules %}
+                <div class="price-row">
+                    <span class="k">{{ s.departure_time|time:'h:i A' }} · {{ s.route }}</span>
+                    <span class="v">₹{{ s.fare }}</span>
+                </div>
+                <div class="action-buttons" style="margin: 0.4rem 0 0.9rem;">
+                    <a href="{% url 'passengers:seat_selection' schedule_id=s.id %}?date={% now 'Y-m-d' %}" class="btn btn-primary btn-sm" style="width:100%; text-align:center;">Select Seats</a>
+                </div>
+                {% empty %}
+                <p style="font-size:0.82rem; color:var(--color-muted); margin:0;">No active schedules for this bus yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if reviews %}
+    <h2 class="page-title" style="margin-top:2rem;">Passenger Reviews</h2>
+    <div class="panel-card">
+        <div class="panel-body">
+            {% for review in reviews %}
+            <div class="notification-item">
+                <div class="noc-icon">★</div>
+                <div class="noc-body">
+                    <div class="noc-title">{{ review.title|default:review.user.username }} <span class="badge yellow">★ {{ review.rating }}/5</span></div>
+                    <div class="noc-text">{{ review.comment }}</div>
+                    <div class="noc-meta">{{ review.user.get_full_name|default:review.user.username }} · {{ review.created_at|date:'d M Y' }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="portal-footer-links">
+        <a href="{% url 'passengers:my_bookings' %}">My Bookings</a> &middot;
+        <a href="{% url 'passengers:dashboard' %}">Dashboard</a>
+    </div>
+</div>
+{% endblock %}

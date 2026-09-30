@@ -1,0 +1,10 @@
+from django.urls import path
+from . import views
+
+app_name = 'ai_assistant'
+
+urlpatterns = [
+    path('', views.chat_view, name='chat'),
+    path('api/chat/', views.chat_api, name='chat_api'),
+    path('api/search/', views.search_api, name='search_api'),
+]

@@ -1,0 +1,106 @@
+{% extends 'base_agency.html' %}
+{% block title %}Booking Details - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="breadcrumb">
+        <a href="{% url 'agencies:dashboard' %}">Dashboard</a>
+        <span class="separator">/</span>
+        <a href="{% url 'agencies:booking_list' %}">Bookings</a>
+        <span class="separator">/</span>
+        <span class="current">Booking {{ booking.booking_id|truncatechars:10 }}</span>
+    </div>
+
+    <div class="page-header">
+        <div>
+            <h1>Booking Details</h1>
+            <p class="page-subtitle">Full information for booking {{ booking.booking_id }}.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:booking_list' %}" class="btn btn-outline">Back to Bookings</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="panel-head">
+            <div class="panel-title">Booking {{ booking.booking_id|truncatechars:12 }}</div>
+            <span class="badge {% if booking.status == 'confirmed' %}green{% elif booking.status == 'pending' %}yellow{% elif booking.status == 'cancelled' %}red{% else %}blue{% endif %}">{{ booking.get_status_display }}</span>
+        </div>
+        <div class="panel-body">
+            <div class="kv-inline">
+                <div class="item">
+                    <span class="lbl">Passenger</span>
+                    <span class="val">{{ booking.passenger_name }}</span>
+                </div>
+                <div class="item">
+                    <span class="lbl">Contact</span>
+                    <span class="val">{{ booking.passenger_phone|default:'—' }}</span>
+                </div>
+                <div class="item">
+                    <span class="lbl">Bus</span>
+                    <span class="val">{{ booking.schedule.bus.bus_name }} ({{ booking.schedule.bus.bus_number }})</span>
+                </div>
+                <div class="item">
+                    <span class="lbl">Route</span>
+                    <span class="val">{{ booking.schedule.route.origin }} → {{ booking.schedule.route.destination }}</span>
+                </div>
+                <div class="item">
+                    <span class="lbl">Departure</span>
+                    <span class="val">{{ booking.schedule.departure_time|time:"h:i A" }}</span>
+                </div>
+                <div class="item">
+                    <span class="lbl">Travel Date</span>
+                    <span class="val">{{ booking.travel_date|date:'d M Y' }}</span>
+                </div>
+                <div class="item">
+                    <span class="lbl">Seats</span>
+                    <span class="val">
+                        {% for s in seats %}{{ s.seat.seat_number }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                    </span>
+                </div>
+                <div class="item">
+                    <span class="lbl">Amount</span>
+                    <span class="val highlight">₹{{ booking.final_amount|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if payment %}
+    <div class="panel-card" style="margin-top:1.5rem;">
+        <div class="panel-head"><div class="panel-title">Payment Information</div></div>
+        <div class="panel-body">
+            <div class="kv-inline">
+                <div class="item"><span class="lbl">Transaction ID</span><span class="val">{{ payment.transaction_id|default:'—' }}</span></div>
+                <div class="item"><span class="lbl">Method</span><span class="val">{{ payment.get_method_display|default:'—' }}</span></div>
+                <div class="item"><span class="lbl">Paid On</span><span class="val">{{ payment.paid_at|date:'d M Y H:i' }}</span></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if cancellations %}
+    <div class="panel-card" style="margin-top:1.5rem;">
+        <div class="panel-head"><div class="panel-title">Cancellations</div></div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Reason</th><th>Status</th><th>Refund</th></tr></thead>
+                <tbody>
+                    {% for c in cancellations %}
+                    <tr>
+                        <td>{{ c.reason }}</td>
+                        <td><span class="badge {% if c.status == 'refunded' %}green{% elif c.status == 'approved' %}blue{% elif c.status == 'rejected' %}red{% else %}yellow{% endif %}">{{ c.get_status_display }}</span></td>
+                        <td>₹{{ c.refund_amount|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="action-buttons" style="margin-top:1.5rem;">
+        <a href="{% url 'agencies:passenger_list' %}" class="btn btn-outline">View Passengers</a>
+        <a href="{% url 'agencies:cancellation_list' %}" class="btn btn-outline">View Cancellations</a>
+    </div>
+</div>
+{% endblock %}

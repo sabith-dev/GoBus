@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}GoBus - Book Bus Tickets Online | India's Smartest Bus Booking{% endblock %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/public.css' %}">{% endblock %}
+
+{% block content %}
+<!-- Hero + Search -->
+<section class="gb-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="mb-3">Travel anywhere. Book everywhere.</h1>
+                <p class="subtitle mx-auto">India's smarter way to book bus tickets. Compare operators, choose your seat and travel worry-free.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search Card -->
+<div class="container">
+    <div class="gb-search-card">
+        <div class="gb-trip-tabs">
+            <button type="button" class="gb-trip-tab active" data-tt="oneway">One Way</button>
+            <button type="button" class="gb-trip-tab" data-tt="roundtrip">Round Trip</button>
+        </div>
+        <form class="gb-search-form row g-3" method="get" action="{% url 'core:search' %}">
+            <input type="hidden" name="trip_type" id="trip_type" value="{{ trip_type|default:'oneway' }}">
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label">From</label>
+                <input type="text" class="form-control" name="from" placeholder="Leaving from..." value="{{ from_city }}" required>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label">To</label>
+                <input type="text" class="form-control" name="to" placeholder="Going to..." value="{{ to_city }}" required>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label">Date of Journey</label>
+                <input type="date" class="form-control" name="date" id="trip_date" value="{{ trip_date }}" required>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label">Return Date</label>
+                <input type="date" class="form-control" name="return_date" id="return_date" disabled>
+            </div>
+            <div class="col-lg-2 d-flex align-items-end">
+                <button type="submit" class="gb-search-btn"><i class="fas fa-search me-2"></i>Search Buses</button>
+            </div>
+            <div class="col-12 mt-3">
+                <span class="gb-search-check"><input type="checkbox" id="f-ac" checked> AC</span>
+                <span class="gb-search-check"><input type="checkbox" id="f-sleeper" checked> Sleeper</span>
+                <span class="gb-search-check"><input type="checkbox" id="f-seater" checked> Seater</span>
+                <span class="gb-search-check"><input type="checkbox" id="f-volvo"> Volvo</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Popular Routes -->
+{% if popular_routes %}
+<section class="gb-section">
+    <div class="container">
+        <div class="gb-section-title">
+            <span class="eyebrow">Trending Now</span>
+            <h2>Popular Bus Routes</h2>
+            <p>Most searched routes by travellers across India.</p>
+        </div>
+        <div class="row g-4">
+            {% for route in popular_routes %}
+            <div class="col-lg-4 col-md-6">
+                <div class="gb-route-card">
+                    <div class="gb-route-arrow">
+                        <span>{{ route.origin }}</span>
+                        <i class="fas fa-arrow-right-long"></i>
+                        <span>{{ route.destination }}</span>
+                    </div>
+                    <div class="mt-2 gb-route-price">
+                        Starting from <span class="amount">₹{{ route.starting_fare }}</span>
+                    </div>
+                    <a class="gb-view-buses" href="{% url 'core:search' %}?from={{ route.origin|urlencode }}&to={{ route.destination|urlencode }}&trip_type=oneway">
+                        View Buses <i class="fas fa-chevron-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Features -->
+<section class="gb-section bg-white">
+    <div class="container">
+        <div class="gb-section-title">
+            <span class="eyebrow">Why GoBus</span>
+            <h2>Why travel with GoBus?</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-lock"></i></div><h6>Secure Booking</h6><p>Protected accounts and a secure, reliable booking flow.</p></div></div>
+            <div class="col-lg-3 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-couch"></i></div><h6>Choose Your Seat</h6><p>Interactive bus seat selection with live availability.</p></div></div>
+            <div class="col-lg-3 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-credit-card"></i></div><h6>Easy Payments</h6><p>UPI, cards, net banking and wallet payments.</p></div></div>
+            <div class="col-lg-3 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-ticket-alt"></i></div><h6>Digital Ticket</h6><p>Instant e-ticket with QR code right on your phone.</p></div></div>
+            <div class="col-lg-3 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-map-marker-alt"></i></div><h6>Live Bus Tracking</h6><p>Track your bus in real time during the journey.</p></div></div>
+            <div class="col-lg-3 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-bell"></i></div><h6>Smart Notifications</h6><p>Booking, payment, cancellation and journey alerts.</p></div></div>
+            <div class="col-lg-3 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-star"></i></div><h6>Verified Reviews</h6><p>Real passenger ratings and reviews for every bus.</p></div></div>
+            <div class="col-lg-3 col-md-6"><div class="gb-feature"><div class="icon"><i class="fas fa-robot"></i></div><h6>GoBus AI Assistant</h6><p>An AI helper that finds buses and answers booking questions.</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Bus Categories -->
+{% if bus_categories %}
+<section class="gb-section">
+    <div class="container">
+        <div class="gb-section-title">
+            <span class="eyebrow">Find Your Ride</span>
+            <h2>Choose your travel style</h2>
+        </div>
+        <div class="row g-3">
+            {% for cat in bus_categories %}
+            <div class="col-6 col-lg-3">
+                <a class="gb-cat" href="{% url 'core:search' %}?bus_type={{ cat.name|urlencode }}&trip_type=oneway">
+                    <div class="icon"><i class="{% if cat.is_sleeper %}fas fa-bed{% elif cat.is_ac %}fas fa-snowflake{% else %}fas fa-bus{% endif %}"></i></div>
+                    <div class="name">{{ cat.name }}</div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Offers -->
+{% if offers %}
+<section class="gb-section bg-white">
+    <div class="container">
+        <div class="gb-section-title">
+            <span class="eyebrow">Save More</span>
+            <h2>Exclusive GoBus Offers</h2>
+            <p>Apply promo codes at checkout and save on every trip.</p>
+        </div>
+        <div class="row g-4">
+            {% for offer in offers %}
+            <div class="col-lg-3 col-md-6">
+                <div class="gb-offer" style="background:linear-gradient(135deg, {% cycle '#3a3a9e' '#1f9d55' '#e66a00' '#b5179e' %}, #16163b);">
+                    <div>
+                        <div class="of-tagline"><i class="fas {{ offer.icon }} me-1"></i>{{ offer.tagline|default:offer.title }}</div>
+                        <div class="of-title">{{ offer.discount_label }}</div>
+                        <div class="of-code">{{ offer.code }}</div>
+                    </div>
+                    <div><a href="{% url 'core:offers' %}" class="text-white" style="font-weight:600;text-decoration:underline;">Book Now</a></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Why GoBus -->
+<section class="gb-section gb-why">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <span class="eyebrow" style="text-transform:uppercase;letter-spacing:2px;font-size:.78rem;font-weight:700;color:var(--gb-accent);">Safety & Trust</span>
+                <h2 class="fw-bold mt-2" style="color:var(--gb-dark);">Why millions choose GoBus</h2>
+                <p class="text-muted">We bring verified operators, transparent pricing and dependable support to every journey — big or small.</p>
+                <a class="gb-btn-solid" href="{% url 'core:features' %}">Explore Features <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+            <div class="col-lg-7">
+                <div class="row g-2">
+                    <div class="col-md-6"><div class="gb-why-item"><div class="tick"><i class="fas fa-check"></i></div><div><h6>Verified Bus Operators</h6><p>Every operator and bus is verified for safety.</p></div></div></div>
+                    <div class="col-md-6"><div class="gb-why-item"><div class="tick"><i class="fas fa-check"></i></div><div><h6>Transparent Pricing</h6><p>Clear fares — no hidden charges, ever.</p></div></div></div>
+                    <div class="col-md-6"><div class="gb-why-item"><div class="tick"><i class="fas fa-check"></i></div><div><h6>Secure Payments</h6><p>PCI compliant checkout with instant receipts.</p></div></div></div>
+                    <div class="col-md-6"><div class="gb-why-item"><div class="tick"><i class="fas fa-check"></i></div><div><h6>Easy Cancellation</h6><p>Cancellations and refunds that are simple.</p></div></div></div>
+                    <div class="col-md-6"><div class="gb-why-item"><div class="tick"><i class="fas fa-check"></i></div><div><h6>24/7 Support</h6><p>Round the clock help before, during and after travel.</p></div></div></div>
+                    <div class="col-md-6"><div class="gb-why-item"><div class="tick"><i class="fas fa-check"></i></div><div><h6>Real-time Journey Info</h6><p>Live location and timeline updates for every trip.</p></div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+{% if testimonials %}
+<section class="gb-section">
+    <div class="container">
+        <div class="gb-section-title">
+            <span class="eyebrow">Loved By Travelers</span>
+            <h2>What our customers say</h2>
+        </div>
+        <div class="row g-4">
+            {% for review in testimonials %}
+            <div class="col-lg-4 col-md-6">
+                <div class="gb-testimonial">
+                    <div class="stars mb-2">
+                        {% for i in "12345" %}{% if forloop.counter <= review.rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                    </div>
+                    <p class="text mb-3">"{{ review.comment|truncatechars:120 }}"</p>
+                    <div class="who">
+                        {{ review.user.first_name|default:review.user.username|title }}
+                        <span class="fw-normal text-muted" style="font-size:.82rem;">&middot; {{ review.bus.bus_name|default:"GoBus Travels" }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- FAQ -->
+{% if faqs %}
+<section class="gb-section gb-why">
+    <div class="container">
+        <div class="gb-section-title">
+            <span class="eyebrow">Need Help?</span>
+            <h2>Frequently Asked Questions</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="accordion gb-faq" id="homeFaq">
+                    {% for faq in faqs %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ forloop.counter }}">
+                                {{ faq.question }}
+                            </button>
+                        </h2>
+                        <div id="faq{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#homeFaq">
+                            <div class="accordion-body text-muted">{{ faq.answer }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'core:faq' %}" class="gb-view-buses">View all FAQs <i class="fas fa-chevron-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- App promo -->
+<section class="gb-section">
+    <div class="container">
+        <div class="gb-app d-flex flex-column flex-lg-row align-items-center justify-content-between">
+            <div class="mb-4 mb-lg-0">
+                <h3>GoBus in your pocket</h3>
+                <p class="mb-0" style="opacity:.85;">Search. Book. Track. Travel. Get the GoBus app today.</p>
+            </div>
+            <div>
+                <a href="#" class="store-badge"><i class="fab fa-google-play"></i><span><small class="d-block" style="opacity:.8;">Get it on</small>Google Play</span></a>
+                <a href="#" class="store-badge"><i class="fab fa-apple"></i><span><small class="d-block" style="opacity:.8;">Download on the</small>App Store</span></a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    var tabs = document.querySelectorAll('.gb-trip-tab');
+    var typeInput = document.getElementById('trip_type');
+    var returnDate = document.getElementById('return_date');
+    var dateInput = document.getElementById('trip_date');
+    tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            tabs.forEach(function (t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            var val = tab.getAttribute('data-tt');
+            typeInput.value = val;
+            returnDate.disabled = val !== 'roundtrip';
+            if (val === 'roundtrip') { returnDate.disabled = false; }
+        });
+    });
+})();
+</script>
+{% endblock %}

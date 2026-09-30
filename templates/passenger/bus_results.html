@@ -1,0 +1,83 @@
+{% extends 'base_passenger.html' %}
+{% block title %}Search Results - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Search Results</h1>
+            <p class="page-subtitle">{{ source }} → {{ destination }} · {{ travel_date }} · {{ passengers }} passenger{{ passengers|pluralize }}</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'passengers:search' %}" class="btn btn-outline">Modify Search</a>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr; gap: 1.5rem;">
+        {% for s in schedules %}
+        <div class="panel-card">
+            <div class="panel-head">
+                <div class="panel-title">{{ s.bus.bus_name }} · {{ s.bus.bus_number }}</div>
+                <div class="action-buttons">
+                    <span class="badge blue">{{ s.bus.bus_type|default:'Bus' }}</span>
+                    {% if s.rating %}<span class="badge yellow">★ {{ s.rating }}</span>{% endif %}
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="kv-inline">
+                    <div class="item">
+                        <span class="lbl">Departure</span>
+                        <span class="val">{{ s.departure_time|time:"h:i A" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Arrival</span>
+                        <span class="val">{{ s.arrival_time|time:"h:i A" }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Duration</span>
+                        <span class="val">{{ s.duration }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Route</span>
+                        <span class="val">{{ s.route.origin }} → {{ s.route.destination }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Seats Available</span>
+                        <span class="val {% if s.seats_left < 5 %}text-danger{% endif %}">{{ s.seats_left }}</span>
+                    </div>
+                    <div class="item">
+                        <span class="lbl">Fare</span>
+                        <span class="val highlight">₹{{ s.fare }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="action-buttons" style="padding:0 1.5rem 1.5rem;">
+                <a href="{% url 'passengers:seat_selection' schedule_id=s.id %}?date={{ travel_date }}" class="btn btn-primary">
+                    {% if s.seats_left > 0 %}View Seats{% else %}Sold Out{% endif %}
+                </a>
+                <a href="{% url 'passengers:bus_details' bus_id=s.bus.id %}" class="btn btn-outline">Bus Details</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="panel-card">
+            <div class="panel-body">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    <p>{% if source and destination %}No buses found for this route on the selected date. Try a different date.{% else %}Enter source and destination in search to see results.{% endif %}</p>
+                    <a href="{% url 'passengers:search' %}" class="btn btn-primary btn-sm">Start a Search</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="portal-footer-links">
+        or <a href="{% url 'passengers:dashboard' %}">return to your dashboard</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .text-danger { color: #ef4444 !important; }
+</style>
+{% endblock %}

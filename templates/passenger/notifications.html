@@ -1,0 +1,45 @@
+{% extends 'base_passenger.html' %}
+{% block title %}Notifications - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Notifications</h1>
+            <p class="page-subtitle">Trip alerts, offers and updates.</p>
+        </div>
+        <div class="action-buttons">
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline btn-sm">Mark All as Read</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="panel-head">
+            <div class="panel-title">Inbox</div>
+            <span class="badge blue">{{ unread_count }} unread</span>
+        </div>
+        <div class="panel-body">
+            {% for n in notifications %}
+            <div class="notification-item {% if not n.is_read %}unread{% endif %}">
+                <div class="noc-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                </div>
+                <div class="noc-body">
+                    <div class="noc-title">{{ n.title }}</div>
+                    <div class="noc-text">{{ n.message }}</div>
+                    <div class="noc-meta">{{ n.get_notification_type_display }} · {{ n.created_at|timesince }} ago</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                <p>No notifications. You're all caught up.</p>
+                <a href="{% url 'passengers:search' %}" class="btn btn-primary btn-sm">Book a Trip</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

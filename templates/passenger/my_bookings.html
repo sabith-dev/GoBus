@@ -1,0 +1,141 @@
+{% extends 'base_passenger.html' %}
+{% block title %}My Bookings - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>My Bookings</h1>
+            <p class="page-subtitle">View and manage all your trips.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'passengers:search' %}" class="btn btn-primary">Book Now</a>
+        </div>
+    </div>
+
+    <div class="tab-pills">
+        <button class="pill active" data-tab="upcoming" onclick="switchTab('upcoming')">Upcoming</button>
+        <button class="pill" data-tab="completed" onclick="switchTab('completed')">Completed</button>
+        <button class="pill" data-tab="cancelled" onclick="switchTab('cancelled')">Cancelled</button>
+    </div>
+
+    <div class="tab-pane active" id="upcoming">
+        <div class="panel-card">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Route</th><th>Bus</th><th>Travel Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for b in upcoming %}
+                        <tr>
+                            <td>{{ b.schedule.route }}</td>
+                            <td>{{ b.schedule.bus.bus_name }}</td>
+                            <td>{{ b.travel_date|date:'d M Y' }} · {{ b.schedule.departure_time|time:'h:i A' }}</td>
+                            <td>₹{{ b.final_amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="badge {% if b.status == 'confirmed' %}green{% else %}yellow{% endif %}">{{ b.get_status_display }}</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons" style="justify-content:flex-start;">
+                                    <a href="{% url 'passengers:ticket' booking_id=b.id %}" class="btn btn-outline btn-sm">Ticket</a>
+                                    <a href="{% url 'passengers:booking_details' booking_id=b.id %}" class="btn btn-outline btn-sm">Details</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                                    <p>No upcoming bookings.</p>
+                                    <a href="{% url 'passengers:search' %}" class="btn btn-primary btn-sm">Book Now</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane" id="completed">
+        <div class="panel-card">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Route</th><th>Bus</th><th>Travel Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for b in completed %}
+                        <tr>
+                            <td>{{ b.schedule.route }}</td>
+                            <td>{{ b.schedule.bus.bus_name }}</td>
+                            <td>{{ b.travel_date|date:'d M Y' }}</td>
+                            <td>₹{{ b.final_amount|floatformat:2 }}</td>
+                            <td><span class="badge blue">{{ b.get_status_display }}</span></td>
+                            <td>
+                                <a href="{% url 'passengers:booking_details' booking_id=b.id %}" class="btn btn-outline btn-sm">Details</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <p>No completed bookings yet.</p>
+                                    <a href="{% url 'passengers:search' %}" class="btn btn-outline btn-sm">Plan a Trip</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane" id="cancelled">
+        <div class="panel-card">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Route</th><th>Travel Date</th><th>Amount</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for b in cancelled %}
+                        <tr>
+                            <td>{{ b.schedule.route }}</td>
+                            <td>{{ b.travel_date|date:'d M Y' }}</td>
+                            <td>₹{{ b.final_amount|floatformat:2 }}</td>
+                            <td><span class="badge red">Cancelled</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                    <p>No cancelled bookings.</p>
+                                    <a href="{% url 'passengers:cancellations' %}" class="btn btn-outline btn-sm">View Cancellations</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchTab(name) {
+    document.querySelectorAll('.tab-pane').forEach(function(pane) { pane.classList.remove('active'); });
+    document.querySelectorAll('.pill').forEach(function(pill) { pill.classList.remove('active'); });
+    document.getElementById(name).classList.add('active');
+    document.querySelector('.pill[data-tab="' + name + '"]').classList.add('active');
+}
+</script>
+{% endblock %}

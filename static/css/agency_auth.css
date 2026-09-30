@@ -1,0 +1,306 @@
+/* ============ GoBus Agency Auth - BusGo-style split layout ============ */
+:root {
+    --ga-primary: #1f1f7a;
+    --ga-primary-dark: #16163b;
+    --ga-primary-deep: #0e0e2c;
+    --ga-accent: #ff7f11;
+    --ga-body-bg: #f4f6fb;
+    --ga-text: #2c3e50;
+    --ga-muted: #6b7a90;
+    --ga-border: #e6eaf2;
+    --ga-white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--ga-body-bg);
+    color: var(--ga-text);
+}
+
+/* ---------- Split layout ---------- */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    background: var(--ga-body-bg);
+}
+
+.auth-sidebar {
+    width: 40%;
+    background: linear-gradient(135deg, var(--ga-primary-deep) 0%, var(--ga-primary-dark) 45%, var(--ga-primary) 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-sidebar::before {
+    content: '';
+    position: absolute;
+    top: -55%;
+    right: -45%;
+    width: 110%;
+    height: 110%;
+    background: radial-gradient(circle, rgba(255, 127, 17, 0.18) 0%, transparent 55%);
+    pointer-events: none;
+}
+
+.auth-sidebar::after {
+    content: '';
+    position: absolute;
+    left: -40%;
+    bottom: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(31, 31, 122, 0.55) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
+}
+
+.sidebar-brand:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.sidebar-brand small {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 400;
+    display: block;
+    line-height: 1.2;
+    letter-spacing: 0;
+}
+
+.sidebar-logo {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--ga-accent) 0%, #ff9d4d 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.15rem;
+    box-shadow: 0 6px 16px rgba(255, 127, 17, 0.4);
+}
+
+.auth-heading {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 40px 0 0;
+    line-height: 1.15;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-tagline {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.95rem;
+    margin: 10px 0 0;
+    max-width: 36ch;
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Decorative panel (illustration slot) ---------- */
+.auth-art {
+    margin: 36px 0 24px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 28px 24px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-art > i {
+    font-size: 2.6rem;
+    color: #fff;
+    opacity: 0.95;
+}
+
+.art-stats {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin: 20px 0 14px;
+}
+
+.art-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.art-num {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.art-lbl {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.auth-art p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.88rem;
+    margin: 0;
+}
+
+.auth-copyright {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Form column ---------- */
+.auth-content {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+}
+
+.auth-form-container {
+    width: 100%;
+    max-width: 560px;
+}
+
+.auth-form-container h2 {
+    font-weight: 800;
+    color: var(--ga-primary-dark);
+    margin: 0 0 6px;
+}
+
+.auth-form-container .lead-sub {
+    color: var(--ga-muted);
+    margin: 0 0 28px;
+}
+
+.required::after {
+    content: ' *';
+    color: var(--ga-accent);
+    font-weight: 700;
+}
+
+.auth-form-container .form-label {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--ga-text);
+}
+
+.auth-form-container .form-control {
+    border: 1px solid var(--ga-border);
+    padding: 11px 14px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.auth-form-container .form-control:focus {
+    border-color: var(--ga-primary);
+    box-shadow: 0 0 0 3px rgba(31, 31, 122, 0.12);
+}
+
+.auth-form-container .input-group-text {
+    background: #fff;
+    border: 1px solid var(--ga-border);
+    color: var(--ga-muted);
+}
+
+.auth-form-container .form-check-label {
+    font-size: 0.9rem;
+    color: var(--ga-muted);
+}
+
+.auth-form-container .text-danger,
+.auth-form-container .invalid-feedback {
+    font-size: 0.82rem;
+}
+
+.btn-auth {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--ga-primary) 0%, var(--ga-primary-dark) 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.02rem;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(31, 31, 122, 0.35);
+    transition: all 0.25s;
+}
+
+.btn-auth:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(31, 31, 122, 0.45);
+    color: #fff;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 26px;
+    color: var(--ga-muted);
+    font-size: 0.92rem;
+}
+
+.auth-switch a {
+    color: var(--ga-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 991.98px) {
+    .auth-page {
+        flex-direction: column;
+    }
+
+    .auth-sidebar {
+        width: 100%;
+        padding: 28px;
+        min-height: auto;
+    }
+
+    .auth-heading {
+        font-size: 1.5rem;
+        margin-top: 26px;
+    }
+
+    .auth-art {
+        display: none;
+    }
+
+    .auth-content {
+        width: 100%;
+        padding: 32px 22px;
+    }
+}

@@ -1,0 +1,278 @@
+﻿{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - GoBus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Work+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(640px 320px at 12% 8%, rgba(255, 127, 17, 0.10), transparent 60%),
+          radial-gradient(640px 340px at 90% 92%, rgba(31, 31, 122, 0.12), transparent 60%),
+          #f4f6fb;
+        padding: 2rem 1rem;
+        font-family: "Work Sans", system-ui, sans-serif;
+      }
+      .admin-auth-card {
+        background: #fff;
+        border-radius: 22px;
+        padding: 2.6rem 2.5rem 2.3rem;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 18px 50px rgba(22, 22, 59, 0.15);
+      }
+      .admin-auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .admin-auth-header .logo-wrap {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 74px;
+        height: 74px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1f1f7a 0%, #3423a0 55%, #ff7f11 140%);
+        margin-bottom: 1.1rem;
+        box-shadow: 0 10px 24px rgba(31, 31, 122, 0.35);
+      }
+      .admin-auth-header .logo-wrap svg {
+        width: 34px;
+        height: 34px;
+        color: #fff;
+      }
+      .admin-auth-header h1 {
+        font-family: "Outfit", sans-serif;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #16163b;
+        margin: 0 0 0.35rem;
+      }
+      .admin-auth-header p {
+        font-size: 0.95rem;
+        color: #7f8c9b;
+        margin: 0;
+      }
+      .admin-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #eef1fb;
+        border: 1px solid #e6eaf2;
+        border-radius: 20px;
+        padding: 0.3rem 0.8rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #1f1f7a;
+        margin-top: 0.75rem;
+      }
+      .admin-badge svg {
+        width: 14px;
+        height: 14px;
+      }
+      .admin-auth-form .form-group {
+        margin-bottom: 1.25rem;
+      }
+      .admin-auth-form label {
+        display: block;
+        font-size: 0.87rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.4rem;
+      }
+      .admin-auth-form input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #e6eaf2;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        color: #2c3e50;
+        outline: none;
+        transition: border-color 0.25s, box-shadow 0.25s;
+        font-family: "Work Sans", sans-serif;
+      }
+      .admin-auth-form input:focus {
+        border-color: #1f1f7a;
+        box-shadow: 0 0 0 3px rgba(31, 31, 122, 0.12);
+      }
+      .admin-auth-form .btn-admin {
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 30px;
+        background: #ff7f11;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          transform 0.15s,
+          box-shadow 0.2s,
+          background 0.2s;
+        margin-top: 0.5rem;
+        box-shadow: 0 8px 20px rgba(255, 127, 17, 0.35);
+        font-family: "Work Sans", sans-serif;
+      }
+      .admin-auth-form .btn-admin:hover {
+        background: #e66a00;
+        transform: translateY(-1px);
+      }
+      .admin-auth-form .btn-admin:active {
+        transform: translateY(0);
+      }
+      .admin-auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.92rem;
+        color: #7f8c9b;
+      }
+      .admin-auth-footer a {
+        color: #1f1f7a;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .admin-auth-footer a:hover {
+        text-decoration: underline;
+      }
+      .admin-messages {
+        margin-bottom: 1rem;
+      }
+      .admin-messages .alert {
+        padding: 0.7rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+      .admin-messages .alert-error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+      }
+      .admin-messages .alert-success {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+      }
+      .admin-messages .alert-info {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1e40af;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-auth-card">
+      <div class="admin-auth-header">
+        <div class="logo-wrap">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M8 6v6M15 6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 00-2 2v10h3"
+            />
+            <circle cx="7" cy="18" r="2" />
+            <path d="M9 18h5" />
+            <circle cx="16" cy="18" r="2" />
+          </svg>
+        </div>
+        <h1>GoBus Admin</h1>
+        <p>Secure administration portal</p>
+        <div class="admin-badge">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
+          </svg>
+          Superuser Access Only
+        </div>
+      </div>
+
+      {% if messages %}
+      <div class="admin-messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form
+        method="post"
+        action="{% url 'admin_portal:login' %}"
+        class="admin-auth-form"
+        autocomplete="off"
+      >
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="id_username">Username</label>
+          <input
+            type="text"
+            name="username"
+            id="id_username"
+            autocomplete="username"
+            autofocus
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="id_password">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="id_password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+        {% if form.non_field_errors %}
+        <div
+          style="
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 1rem;
+          "
+        >
+          {% for error in form.non_field_errors %}
+          <p style="color: #991b1b; font-size: 0.85rem; margin: 0">
+            {{ error }}
+          </p>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <button type="submit" class="btn-admin">Sign In to Admin Panel</button>
+      </form>
+
+      {% comment %}
+      <div class="admin-auth-footer">
+        <a href="{% url 'accounts:login' %}">&larr; Back to main login</a>
+      </div>
+      {% endcomment %}
+    </div>
+  </body>
+</html>

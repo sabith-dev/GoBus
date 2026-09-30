@@ -1,0 +1,90 @@
+{% extends 'base_agency.html' %}
+{% block title %}Earnings - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Earnings</h1>
+            <p class="page-subtitle">Track your revenue across trips.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:booking_list' %}" class="btn btn-outline">View Bookings</a>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card green">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <span class="label">Today's Earnings</span>
+            <span class="value">₹{{ today_earnings|floatformat:0 }}</span>
+            <span class="trend">Earnings today</span>
+        </div>
+        <div class="stat-card rose">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <span class="label">This Week</span>
+            <span class="value">₹{{ week_earnings|floatformat:0 }}</span>
+            <span class="trend">Weekly total</span>
+        </div>
+        <div class="stat-card blue">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <span class="label">This Month</span>
+            <span class="value">₹{{ month_earnings|floatformat:0 }}</span>
+            <span class="trend">Monthly total</span>
+        </div>
+        <div class="stat-card yellow">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <span class="label">All Time</span>
+            <span class="value">₹{{ total_earnings|floatformat:0 }}</span>
+            <span class="trend">{{ payments_count }} completed payments</span>
+        </div>
+    </div>
+
+    <div class="panel-card" style="margin-top:1.5rem;">
+        <div class="panel-head">
+            <div class="panel-title">Earnings History</div>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Transaction</th>
+                        <th>Passenger</th>
+                        <th>Route</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in recent_payments %}
+                    <tr>
+                        <td>{{ p.transaction_id|default:'—' }}</td>
+                        <td>{{ p.booking.passenger_name }}</td>
+                        <td>{{ p.booking.schedule.route }}</td>
+                        <td>₹{{ p.amount|floatformat:2 }}</td>
+                        <td>{{ p.paid_at|date:'d M Y' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                <p>No earnings data yet.</p>
+                                <a href="{% url 'agencies:schedule_list' %}" class="btn btn-primary btn-sm">Manage Schedules</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

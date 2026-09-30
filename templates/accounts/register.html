@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Create Account - GoBus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/authentication.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-head">
+            <div class="auth-emblem"><i class="fas fa-bus"></i></div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-sub">Join GoBus and start booking your trips</p>
+        </div>
+
+        <div class="auth-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {{ form.username|as_crispy_field }}
+                {{ form.email|as_crispy_field }}
+                {{ form.phone_number|as_crispy_field }}
+                {{ form.password1|as_crispy_field }}
+                {{ form.password2|as_crispy_field }}
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+            </form>
+        </div>
+
+        <div class="auth-foot">
+            Already have an account? <a href="{% url 'accounts:login' %}">Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

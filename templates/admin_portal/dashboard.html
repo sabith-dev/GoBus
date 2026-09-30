@@ -1,0 +1,283 @@
+{% extends "admin_portal/base_admin.html" %} {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<div class="admin-dash">
+  <h1>Admin Dashboard</h1>
+  <p class="subtitle">Overview of your GoBus platform</p>
+
+  <div class="stat-grid">
+    <div class="stat-card pink">
+      <div class="icon">👥</div>
+      <div class="label">Total Users</div>
+      <div class="value">{{ total_users|default:"0" }}</div>
+    </div>
+    <div class="stat-card rose">
+      <div class="icon">🏢</div>
+      <div class="label">Agencies</div>
+      <div class="value">{{ total_agencies|default:"0" }}</div>
+    </div>
+    <div class="stat-card green">
+      <div class="icon">🚌</div>
+      <div class="label">Active Buses</div>
+      <div class="value">{{ active_buses|default:"0" }}</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="icon">🎫</div>
+      <div class="label">Total Bookings</div>
+      <div class="value">{{ total_bookings|default:"0" }}</div>
+    </div>
+    <div class="stat-card pink">
+      <div class="icon">💰</div>
+      <div class="label">Revenue</div>
+      <div class="value">₹{{ total_revenue|default:"0" }}</div>
+    </div>
+    <div class="stat-card rose">
+      <div class="icon">📍</div>
+      <div class="label">Cities</div>
+      <div class="value">{{ total_cities|default:"0" }}</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="icon">🗺️</div>
+      <div class="label">Routes</div>
+      <div class="value">{{ total_routes|default:"0" }}</div>
+    </div>
+    <div class="stat-card red">
+      <div class="icon">⏳</div>
+      <div class="label">Pending Requests</div>
+      <div class="value">{{ pending_agencies|default:"0" }}</div>
+    </div>
+  </div>
+
+  <div class="revenue-grid">
+    <div class="revenue-card">
+      <h3>Today's Revenue</h3>
+      <div class="amount">₹{{ today_revenue|default:"0" }}</div>
+      <div class="period">{{ today_bookings|default:"0" }} bookings today</div>
+    </div>
+    <div class="revenue-card alt">
+      <h3>Weekly Revenue</h3>
+      <div class="amount">₹{{ weekly_revenue|default:"0" }}</div>
+      <div class="period">Last 7 days</div>
+    </div>
+    <div class="revenue-card green-grad">
+      <h3>Monthly Revenue</h3>
+      <div class="amount">₹{{ monthly_revenue|default:"0" }}</div>
+      <div class="period">Last 30 days</div>
+    </div>
+  </div>
+
+  <div class="section-title">Analytics Charts</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h4>Revenue Trend</h4>
+      <div class="chart-canvas-wrap"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h4>Bookings Trend</h4>
+      <div class="chart-canvas-wrap"><canvas id="bookingsChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h4>Popular Cities</h4>
+      <div class="chart-canvas-wrap"><canvas id="citiesChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h4>Occupancy Rate</h4>
+      <div class="chart-canvas-wrap center">
+        <canvas id="occupancyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-list">
+    <div class="top-list-card">
+      <h4>Top Routes</h4>
+      <ol>
+        {% for route in top_routes %}
+        <li>
+          <strong>{{ route.origin }} → {{ route.destination }}</strong> — {{
+          route.booking_count }} bookings
+        </li>
+        {% empty %}
+        <li>No data available</li>
+        {% endfor %}
+      </ol>
+    </div>
+    <div class="top-list-card">
+      <h4>Popular Cities</h4>
+      <ol>
+        {% for city in popular_cities %}
+        <li>
+          <strong>{{ city.name }}</strong> — {{ city.departures }} departures
+        </li>
+        {% empty %}
+        <li>No data available</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
+  <div class="section-title">Recent Bookings</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Booking ID</th>
+          <th>User</th>
+          <th>Bus</th>
+          <th>Passengers</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in recent_bookings %}
+        <tr>
+          <td><strong>#{{ booking.id }}</strong></td>
+          <td>
+            {{ booking.user.get_full_name|default:booking.user.username }}
+          </td>
+          <td>{{ booking.bus.bus_number|default:"—" }}</td>
+          <td>{{ booking.total_passengers|default:"—" }}</td>
+          <td>₹{{ booking.final_amount|default:"0" }}</td>
+          <td>
+            {% if booking.status == 'confirmed' %}
+            <span class="badge badge-green">Confirmed</span>
+            {% elif booking.status == 'pending' %}
+            <span class="badge badge-yellow">Pending</span>
+            {% elif booking.status == 'cancelled' %}
+            <span class="badge badge-red">Cancelled</span>
+            {% elif booking.status == 'completed' %}
+            <span class="badge badge-pink">Completed</span>
+            {% else %}
+            <span class="badge badge-pink">{{ booking.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ booking.booked_at|date:"d M Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="empty-state">No recent bookings</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const primaryColor = '#1F1F7A';
+  const roseColor = '#3A3A9E';
+  const roseLight = 'rgba(31,31,122,0.1)';
+  const roseLight2 = 'rgba(52,35,160,0.1)';
+
+  const revenueData = {{ revenue_chart_data|safe }};
+  const bookingsData = {{ bookings_chart_data|safe }};
+  const citiesData = {{ cities_chart_data|safe }};
+  const occupancyRate = {{ occupancy_rate|default:"0" }};
+
+  if (revenueData.length) {
+    new Chart(document.getElementById('revenueChart'), {
+      type: 'line',
+      data: {
+        labels: revenueData.map(d => d.date),
+        datasets: [{
+          label: 'Revenue (₹)',
+          data: revenueData.map(d => d.total),
+          borderColor: primaryColor,
+          backgroundColor: roseLight,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 3,
+          pointBackgroundColor: primaryColor,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { callback: v => '₹' + v.toLocaleString() } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  if (bookingsData.length) {
+    new Chart(document.getElementById('bookingsChart'), {
+      type: 'bar',
+      data: {
+        labels: bookingsData.map(d => d.date),
+        datasets: [{
+          label: 'Bookings',
+          data: bookingsData.map(d => d.count),
+          backgroundColor: roseColor,
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1 } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  if (citiesData.length) {
+    new Chart(document.getElementById('citiesChart'), {
+      type: 'bar',
+      data: {
+        labels: citiesData.map(d => d.name),
+        datasets: [
+          { label: 'Departures', data: citiesData.map(d => d.departures), backgroundColor: primaryColor, borderRadius: 4 },
+          { label: 'Arrivals', data: citiesData.map(d => d.arrivals), backgroundColor: roseColor, borderRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1 } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  new Chart(document.getElementById('occupancyChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Occupied', 'Available'],
+      datasets: [{
+        data: [occupancyRate, Math.max(0, 100 - occupancyRate)],
+        backgroundColor: [primaryColor, '#E6EAF2'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '70%',
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } },
+        tooltip: { callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed + '%' } }
+      }
+    },
+    plugins: [{
+      id: 'centerText',
+      afterDraw(chart) {
+        const { ctx, width, height } = chart;
+        ctx.save();
+        ctx.font = 'bold 28px Outfit, sans-serif';
+        ctx.fillStyle = '#16163B';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(occupancyRate + '%', width / 2, height / 2);
+        ctx.restore();
+      }
+    }]
+  });
+</script>
+{% endblock %}

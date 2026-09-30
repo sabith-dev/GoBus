@@ -1,0 +1,56 @@
+{% extends 'base_agency.html' %}
+{% block title %}Reviews - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Reviews</h1>
+            <p class="page-subtitle">See what passengers think about your service.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:earnings' %}" class="btn btn-outline">View Earnings</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Passenger</th>
+                        <th>Rating</th>
+                        <th>Comments</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                    <tr>
+                        <td>
+                            <div class="cell-main">{{ review.user.get_full_name|default:review.user.username }}</div>
+                            <div class="cell-sub">{{ review.bus.bus_name }}</div>
+                        </td>
+                        <td><span class="badge yellow">★ {{ review.rating }}/5</span></td>
+                        <td>
+                            <div class="cell-main">{{ review.title|default:'—' }}</div>
+                            <div class="cell-sub">{{ review.comment|truncatechars:90 }}</div>
+                        </td>
+                        <td>{{ review.created_at|date:'d M Y' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <p>No reviews yet. Reviews appear after passengers complete a trip.</p>
+                                <a href="{% url 'agencies:booking_list' %}" class="btn btn-primary btn-sm">View Bookings</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

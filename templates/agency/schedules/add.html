@@ -1,0 +1,32 @@
+{% extends 'base_agency.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Add Schedule - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Add Schedule</h1>
+            <p class="page-subtitle">Schedule a departure for one of your routes.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:schedule_list' %}" class="btn btn-outline">Back to Schedules</a>
+        </div>
+    </div>
+
+    <div class="panel-card" style="max-width: 900px;">
+        <div class="panel-head">
+            <div class="panel-title">Schedule Details</div>
+        </div>
+        <div class="panel-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="action-buttons" style="margin-top:1.25rem;">
+                    <button type="submit" class="btn btn-primary">Add Schedule</button>
+                    <a href="{% url 'agencies:schedule_list' %}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GoBus Agency{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <style>
+        :root {
+            --color-primary: #1f1f7a;
+            --color-primary-light: #6f6fd0;
+            --color-primary-dark: #161652;
+            --color-foreground: #20205e;
+            --color-muted: #63639e;
+            --color-background: #efeffb;
+            --color-surface: #ffffff;
+            --color-border: #d8d6f0;
+            --color-border-soft: #eae8f8;
+            --color-text: #2c2c5e;
+            --portal-glow: 31, 31, 122;
+            --portal-deep: 16, 16, 62;
+            --portal-bg: #f4f3fb;
+            --portal-sidebar-from: #10103d;
+            --portal-sidebar-to: #1f1f7a;
+            --portal-hover: #f2f0fb;
+            --portal-toolbar: #efedf9;
+            --portal-badge: #ff7f11;
+            --portal-badge-text: #ffffff;
+            --portal-sidebar-icon: #ffb266;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="admin-body agency-portal">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="agencySidebar">
+        <div class="admin-sidebar-header">
+            <a href="{% url 'agencies:dashboard' %}" class="admin-sidebar-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 6v6M15 6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 00-2 2v10h3"/>
+                    <circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/>
+                </svg>
+                <span>GoBus</span>
+                <span class="admin-sidebar-badge">Agency</span>
+            </a>
+        </div>
+
+        <nav class="admin-sidebar-nav">
+            <div class="admin-nav-section">Main</div>
+            <a href="{% url 'agencies:dashboard' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="admin-nav-divider"></div>
+
+            <div class="admin-nav-section">Fleet</div>
+            <a href="{% url 'agencies:bus_list' %}" class="admin-nav-link {% if 'bus' in request.resolver_match.url_name %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                <span>Buses</span>
+            </a>
+            <a href="{% url 'agencies:route_list' %}" class="admin-nav-link {% if 'route' in request.resolver_match.url_name %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 000-7h-11a3.5 3.5 0 010-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+                <span>Routes</span>
+            </a>
+            <a href="{% url 'agencies:schedule_list' %}" class="admin-nav-link {% if 'schedule' in request.resolver_match.url_name %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>Schedules</span>
+            </a>
+
+            <div class="admin-nav-divider"></div>
+
+            <div class="admin-nav-section">Operations</div>
+            <a href="{% url 'agencies:booking_list' %}" class="admin-nav-link {% if 'booking' in request.resolver_match.url_name %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                <span>Bookings</span>
+            </a>
+            <a href="{% url 'agencies:passenger_list' %}" class="admin-nav-link {% if 'passenger' in request.resolver_match.url_name %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                <span>Passengers</span>
+            </a>
+            <a href="{% url 'agencies:cancellation_list' %}" class="admin-nav-link {% if 'cancellation' in request.resolver_match.url_name %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                <span>Cancellations</span>
+            </a>
+
+            <div class="admin-nav-divider"></div>
+
+            <div class="admin-nav-section">Revenue</div>
+            <a href="{% url 'agencies:earnings' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'earnings' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Earnings</span>
+            </a>
+            <a href="{% url 'agencies:review_list' %}" class="admin-nav-link {% if 'review' in request.resolver_match.url_name %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>Reviews</span>
+            </a>
+
+            <div class="admin-nav-divider"></div>
+
+            <div class="admin-nav-section">Account</div>
+            <a href="{% url 'agencies:profile' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+            </a>
+            <a href="{% url 'agencies:settings' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                <span>Settings</span>
+            </a>
+            <a href="{% url 'agencies:notifications' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                <span>Notifications</span>
+            </a>
+        </nav>
+
+        <div class="admin-sidebar-footer">
+            <a href="{% url 'core:home' %}" class="admin-nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Back to Website</span>
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="admin-nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <div class="admin-topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <div class="admin-topbar-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <input type="text" placeholder="Search agency portal...">
+                </div>
+            </div>
+            <div class="admin-topbar-right">
+                <a href="{% url 'agencies:notifications' %}" class="admin-notif-btn" title="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <span class="admin-notif-badge"></span>
+                </a>
+                <a href="{% url 'agencies:profile' %}" class="admin-user-chip" style="text-decoration:none;">
+                    <div class="admin-user-avatar">{{ user.first_name.0|default:user.username.0|upper }}{{ user.last_name.0|default:"" }}</div>
+                    <span class="admin-user-name">{{ user.get_full_name|default:user.username }}</span>
+                </a>
+            </div>
+        </header>
+
+        {% if messages %}
+        <div class="admin-messages" style="padding: 0 1.5rem;">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="admin-content">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <script>
+    document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+        document.getElementById('agencySidebar').classList.toggle('open');
+    });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

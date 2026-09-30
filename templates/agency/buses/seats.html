@@ -1,0 +1,80 @@
+{% extends 'base_agency.html' %}
+{% block title %}Bus Seats - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="breadcrumb">
+        <a href="{% url 'agencies:dashboard' %}">Dashboard</a>
+        <span class="separator">/</span>
+        <a href="{% url 'agencies:bus_list' %}">Buses</a>
+        <span class="separator">/</span>
+        <span class="current">Seats · {{ bus.bus_number }}</span>
+    </div>
+
+    <div class="page-header">
+        <div>
+            <h1>Bus Seats</h1>
+            <p class="page-subtitle">{{ bus.bus_name }} — toggle seat availability.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:bus_details' bus_id=bus.id %}" class="btn btn-outline">Bus Details</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="panel-head">
+            <div class="panel-title">Seat Layout</div>
+            <div class="action-buttons">
+                <span class="badge green">Available</span>
+                <span class="badge blue">Unavailable</span>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Seat</th>
+                        <th>Deck</th>
+                        <th>Row</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for seat in seats %}
+                    <tr>
+                        <td>
+                            <div class="cell-main">{{ seat.seat_number }}</div>
+                            <div class="cell-sub">{% if seat.is_window %}Window{% endif %}</div>
+                        </td>
+                        <td>{{ seat.deck }}</td>
+                        <td>{{ seat.row }}-{{ seat.column }}</td>
+                        <td>{{ seat.get_seat_type_display }}</td>
+                        <td>
+                            <span class="badge {% if seat.is_available %}green{% else %}blue{% endif %}">{{ seat.is_available|yesno:'Available,Unavailable' }}</span>
+                        </td>
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="seat_id" value="{{ seat.id }}">
+                                <button type="submit" class="btn btn-outline btn-sm">Toggle</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="18"/></svg>
+                                <p>No seats found for this bus. Edit the bus capacity to generate seats.</p>
+                                <a href="{% url 'agencies:bus_edit' bus_id=bus.id %}" class="btn btn-primary btn-sm">Edit Bus</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

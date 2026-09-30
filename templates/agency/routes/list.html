@@ -1,0 +1,64 @@
+{% extends 'base_agency.html' %}
+{% block title %}Routes - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Routes</h1>
+            <p class="page-subtitle">Manage the routes your buses travel on.</p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'agencies:route_add' %}" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Route
+            </a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Route</th>
+                        <th>Distance</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for route in routes %}
+                    <tr>
+                        <td>
+                            <div class="cell-main">{{ route.name|default:route }}</div>
+                            <div class="cell-sub">{{ route.origin }} → {{ route.destination }}</div>
+                        </td>
+                        <td>{{ route.distance_km }} km</td>
+                        <td>{{ route.estimated_duration|time:"H:i" }} hr</td>
+                        <td>
+                            <span class="badge {% if route.is_active %}green{% else %}blue{% endif %}">{{ route.is_active|yesno:'Active,Inactive' }}</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons" style="justify-content:flex-start;">
+                                <a href="{% url 'agencies:route_edit' route_id=route.id %}" class="btn btn-outline btn-sm">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 000-7h-11a3.5 3.5 0 010-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+                                <p>No routes created yet.</p>
+                                <a href="{% url 'agencies:route_add' %}" class="btn btn-primary btn-sm">Create a Route</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

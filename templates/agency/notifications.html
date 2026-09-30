@@ -1,0 +1,46 @@
+{% extends 'base_agency.html' %}
+{% block title %}Notifications - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="page-header">
+        <div>
+            <h1>Notifications</h1>
+            <p class="page-subtitle">Keep track of bookings, earnings and system updates.</p>
+        </div>
+        <div class="action-buttons">
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline">Mark All as Read</button>
+            </form>
+            <a href="{% url 'agencies:booking_list' %}" class="btn btn-outline">View Bookings</a>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="panel-head">
+            <div class="panel-title">Inbox</div>
+            <span class="badge blue">{{ unread_count }} unread</span>
+        </div>
+        <div class="panel-body">
+            {% for n in notifications %}
+            <div class="notification-item {% if not n.is_read %}unread{% endif %}">
+                <div class="noc-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                </div>
+                <div class="noc-body">
+                    <div class="noc-title">{{ n.title }}</div>
+                    <div class="noc-text">{{ n.message }}</div>
+                    <div class="noc-meta">{{ n.get_notification_type_display }} · {{ n.created_at|timesince }} ago</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                <p>You're all caught up. New notifications will appear here.</p>
+                <a href="{% url 'agencies:dashboard' %}" class="btn btn-primary btn-sm">Go to Dashboard</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

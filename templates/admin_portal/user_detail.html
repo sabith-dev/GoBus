@@ -1,0 +1,299 @@
+{% extends "admin_portal/base_admin.html" %}
+{% load static %}
+
+{% block title %}User Detail - {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<div class="user-detail-page">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a href="{% url 'admin_portal:users' %}">Users</a>
+    <span class="separator">/</span>
+    <span class="current">{{ profile_user.username }}</span>
+  </nav>
+
+  <!-- User Info Card -->
+  <div class="user-card">
+    <div class="user-card-header">
+      <div class="user-avatar">
+        {{ profile_user.username|first|upper }}
+      </div>
+      <div>
+        <h1 class="user-card-title">
+          {{ profile_user.first_name }} {{ profile_user.last_name }}
+        </h1>
+        <p class="user-card-email">{{ profile_user.email }}</p>
+        <span class="user-card-role">{{ profile_user.user_type|default:"User" }}</span>
+      </div>
+    </div>
+
+    <div class="user-meta-grid">
+      <div class="user-meta-item">
+        <span class="user-meta-label">Phone</span>
+        <span class="user-meta-value">{{ profile_user.phone_number|default:"Not provided" }}</span>
+      </div>
+      <div class="user-meta-item">
+        <span class="user-meta-label">Email Verified</span>
+        <span class="user-meta-value">
+          {% if profile_user.email_verified %}
+            <span class="badge badge-success"><span class="badge-dot"></span> Verified</span>
+          {% else %}
+            <span class="badge badge-warning"><span class="badge-dot"></span> Unverified</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="user-meta-item">
+        <span class="user-meta-label">Account Status</span>
+        <span class="user-meta-value">
+          {% if profile_user.is_active %}
+            <span class="badge badge-success"><span class="badge-dot"></span> Active</span>
+          {% else %}
+            <span class="badge badge-danger"><span class="badge-dot"></span> Suspended</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="user-meta-item">
+        <span class="user-meta-label">Joined</span>
+        <span class="user-meta-value">{{ profile_user.date_joined|date:"M d, Y" }}</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-bar">
+      {% if not profile_user.email_verified %}
+        <form method="POST" action="{% url 'admin_portal:user_detail' pk=profile_user.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="verify">
+          <button type="submit" class="btn btn-success">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+            Verify Email
+          </button>
+        </form>
+      {% endif %}
+
+      {% if profile_user.is_active %}
+        <form method="POST" action="{% url 'admin_portal:user_detail' pk=profile_user.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="suspend">
+          <button type="submit" class="btn btn-warning">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm6.75-1.25a.75.75 0 00-1.5 0v5a.75.75 0 001.5 0v-5zM10.75 8a.75.75 0 00-1.5 0v5a.75.75 0 001.5 0v-5z"/></svg>
+            Suspend
+          </button>
+        </form>
+      {% else %}
+        <form method="POST" action="{% url 'admin_portal:user_detail' pk=profile_user.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="activate">
+          <button type="submit" class="btn btn-success">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm6.75-1.25a.75.75 0 00-1.5 0v5a.75.75 0 001.5 0v-5zM10.75 8a.75.75 0 00-1.5 0v5a.75.75 0 001.5 0v-5z"/></svg>
+            Activate
+          </button>
+        </form>
+      {% endif %}
+
+      <form method="POST" action="{% url 'admin_portal:user_detail' pk=profile_user.id %}" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete">
+        <button type="submit" class="btn btn-danger">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd"/></svg>
+          Delete User
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabs Container -->
+  <div class="tabs-container">
+    <div class="tabs-header">
+      <button class="tab-btn active" onclick="switchTab('bookings')" data-tab="bookings">
+        Bookings
+        <span class="tab-count">{{ bookings|length }}</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('payments')" data-tab="payments">
+        Payments
+        <span class="tab-count">{{ payments|length }}</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('wallet')" data-tab="wallet">
+        Wallet
+        <span class="tab-count">1</span>
+      </button>
+    </div>
+
+    <!-- Bookings Tab -->
+    <div id="tab-bookings" class="tab-panel active">
+      {% if bookings %}
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Bus</th>
+                <th>Route</th>
+                <th>Date</th>
+                <th>Passengers</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in bookings %}
+                <tr>
+                  <td><strong>#{{ b.id }}</strong></td>
+                  <td>{{ b.bus.bus_number }}</td>
+                  <td>{{ b.route }}</td>
+                  <td>{{ b.booked_at|date:"M d, Y" }}</td>
+                  <td>{{ b.total_passengers }}</td>
+                  <td><strong>₹{{ b.final_amount }}</strong></td>
+                  <td>
+                    {% if b.status == "confirmed" or b.status == "confirmed" %}
+                      <span class="badge badge-success"><span class="badge-dot"></span> {{ b.status|title }}</span>
+                    {% elif b.status == "pending" %}
+                      <span class="badge badge-warning"><span class="badge-dot"></span> {{ b.status|title }}</span>
+                    {% elif b.status == "cancelled" %}
+                      <span class="badge badge-danger"><span class="badge-dot"></span> {{ b.status|title }}</span>
+                    {% elif b.status == "completed" %}
+                      <span class="badge badge-info"><span class="badge-dot"></span> {{ b.status|title }}</span>
+                    {% else %}
+                      <span class="badge badge-secondary"><span class="badge-dot"></span> {{ b.status|title }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m-10.5-3.75h10.5a1.5 1.5 0 001.5-1.5V5.25a1.5 1.5 0 00-1.5-1.5H4.5A1.5 1.5 0 003 5.25v6a1.5 1.5 0 001.5 1.5z"/></svg>
+          <p>No bookings found for this user.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Payments Tab -->
+    <div id="tab-payments" class="tab-panel">
+      {% if payments %}
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Booking</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in payments %}
+                <tr>
+                  <td><strong>#{{ p.id }}</strong></td>
+                  <td>#{{ p.booking.id }}</td>
+                  <td><strong>₹{{ p.amount }}</strong></td>
+                  <td>{{ p.method|title }}</td>
+                  <td>
+                    {% if p.status == "completed" or p.status == "success" %}
+                      <span class="badge badge-success"><span class="badge-dot"></span> {{ p.status|title }}</span>
+                    {% elif p.status == "pending" %}
+                      <span class="badge badge-warning"><span class="badge-dot"></span> {{ p.status|title }}</span>
+                    {% elif p.status == "failed" or p.status == "refunded" %}
+                      <span class="badge badge-danger"><span class="badge-dot"></span> {{ p.status|title }}</span>
+                    {% else %}
+                      <span class="badge badge-secondary"><span class="badge-dot"></span> {{ p.status|title }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted">{{ p.created_at|date:"M d, Y H:i" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+          <p>No payments found for this user.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Wallet Tab -->
+    <div id="tab-wallet" class="tab-panel">
+      {% if wallet %}
+        <div class="wallet-card">
+          <div class="wallet-label">Wallet Balance</div>
+          <div class="wallet-balance">₹{{ wallet.balance }}</div>
+          <div class="wallet-sub">Available for bookings</div>
+        </div>
+
+        {% if wallet_txns %}
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for txn in wallet_txns %}
+                  <tr>
+                    <td class="text-muted">{{ txn.created_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                      {% if txn.transaction_type == "credit" %}
+                        <span class="badge badge-success"><span class="badge-dot"></span> Credit</span>
+                      {% elif txn.transaction_type == "debit" %}
+                        <span class="badge badge-danger"><span class="badge-dot"></span> Debit</span>
+                      {% elif txn.transaction_type == "refund" %}
+                        <span class="badge badge-info"><span class="badge-dot"></span> Refund</span>
+                      {% else %}
+                        <span class="badge badge-secondary"><span class="badge-dot"></span> {{ txn.transaction_type|title }}</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if txn.transaction_type == "credit" or txn.transaction_type == "refund" %}
+                        <strong style="color:#16A34A;">+₹{{ txn.amount }}</strong>
+                      {% else %}
+                        <strong style="color:#DC2626;">-₹{{ txn.amount }}</strong>
+                      {% endif %}
+                    </td>
+                    <td>{{ txn.description|default:"-" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"/></svg>
+          <p>No wallet found for this user.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(panel) {
+      panel.classList.remove('active');
+    });
+
+    var targetBtn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+    var targetPanel = document.getElementById('tab-' + tabName);
+
+    if (targetBtn) {
+      targetBtn.classList.add('active');
+    }
+    if (targetPanel) {
+      targetPanel.classList.add('active');
+    }
+  }
+</script>
+{% endblock %}

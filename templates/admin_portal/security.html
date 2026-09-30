@@ -1,0 +1,260 @@
+{% extends "admin_portal/base_admin.html" %} {% block content %}
+
+<div class="admin-security">
+  <h1>Security</h1>
+  <p class="subtitle">
+    Monitor login activity, security alerts, and audit logs
+  </p>
+
+  <div class="alert-banner">
+    <span class="icon">🔒</span>
+    <span class="text">Security Overview</span>
+    <span class="count">{{ security_alerts|length|default:"0" }} alerts</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(event, 'tab-sessions')">
+      Login Logs ({{ sessions|length }})
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-failed')">
+      Failed Login
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-ip')">
+      IP Tracking
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-2fa')">
+      Two-Factor Auth
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-audit')">
+      Audit Logs
+    </button>
+  </div>
+
+  <div id="tab-sessions" class="tab-content active">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>IP Address</th>
+            <th>Device</th>
+            <th>Browser</th>
+            <th>Login Time</th>
+            <th>Duration</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for session in sessions %}
+          <tr>
+            <td><strong>{{ session.username_attempted }}</strong></td>
+            <td class="mono">{{ session.ip_address }}</td>
+            <td>{{ session.device|default:"—" }}</td>
+            <td>{{ session.browser|default:"—" }}</td>
+            <td>{{ session.created_at|date:"d M Y H:i" }}</td>
+            <td>—</td>
+            <td>
+              <span
+                class="badge {% if session.is_success %}badge-green{% else %}badge-red{% endif %}"
+                >{{ session.is_success|yesno:"Success,Failed" }}</span
+              >
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="empty-state">No login sessions</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-failed" class="tab-content">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Email / Username</th>
+            <th>IP Address</th>
+            <th>Reason</th>
+            <th>Attempts</th>
+            <th>Last Attempt</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attempt in failed_logins %}
+          <tr>
+            <td><strong>{{ attempt.username }}</strong></td>
+            <td class="mono">{{ attempt.ip_address }}</td>
+            <td>{{ attempt.reason|default:"Invalid credentials" }}</td>
+            <td>{{ attempt.attempt_count }}</td>
+            <td>{{ attempt.created_at|date:"d M Y H:i" }}</td>
+            <td>
+              {% if attempt.is_locked %}<span class="badge badge-red"
+                >Locked</span
+              >
+              {% else %}<span class="badge badge-yellow">Active</span>{% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="empty-state">No failed login attempts</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-ip" class="tab-content">
+    <div class="section-title">Whitelisted IPs</div>
+    <div class="ip-list">
+      {% for ip in whitelisted_ips %}
+      <div class="ip-item success">
+        <div>
+          <div class="address">{{ ip.address }}</div>
+          <div class="meta">{{ ip.label|default:"" }}</div>
+        </div>
+        <form method="post">
+          {% csrf_token %}<input
+            type="hidden"
+            name="action"
+            value="remove_whitelist"
+          /><input type="hidden" name="ip" value="{{ ip.address }}" /><button
+            class="btn btn-outline btn-sm"
+          >
+            Remove
+          </button>
+        </form>
+      </div>
+      {% empty %}
+      <p class="empty-state">No whitelisted IPs</p>
+      {% endfor %}
+    </div>
+
+    <div class="section-title">Blacklisted IPs</div>
+    <div class="ip-list">
+      {% for ip in blacklisted_ips %}
+      <div class="ip-item danger">
+        <div>
+          <div class="address">{{ ip.address }}</div>
+          <div class="meta">{{ ip.reason|default:"Suspicious activity" }}</div>
+        </div>
+        <form method="post">
+          {% csrf_token %}<input
+            type="hidden"
+            name="action"
+            value="remove_blacklist"
+          /><input type="hidden" name="ip" value="{{ ip.address }}" /><button
+            class="btn btn-outline btn-sm"
+          >
+            Remove
+          </button>
+        </form>
+      </div>
+      {% empty %}
+      <p class="empty-state">No blacklisted IPs</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div id="tab-2fa" class="tab-content">
+    <div class="twofa-card">
+      <h4>Two-Factor Authentication Status</h4>
+      <p>Monitor 2FA adoption across admin accounts</p>
+      <div class="status-row">
+        <span
+          ><strong>{{ users_with_2fa|default:"0" }}</strong> users with 2FA
+          enabled</span
+        >
+        <span
+          ><strong>{{ users_without_2fa|default:"0" }}</strong> users without
+          2FA</span
+        >
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>2FA Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in all_users %}
+          <tr>
+            <td><strong>{{ u.username }}</strong></td>
+            <td>{{ u.email }}</td>
+            <td><span class="badge badge-yellow">Not configured</span></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3" class="empty-state">No users found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-audit" class="tab-content">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Resource</th>
+            <th>Details</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in audit_logs %}
+          <tr>
+            <td style="white-space: nowrap">
+              {{ log.created_at|date:"d M Y H:i:s" }}
+            </td>
+            <td><strong>{{ log.user.username }}</strong></td>
+            <td><span class="badge badge-pink">{{ log.action }}</span></td>
+            <td>{{ log.resource }}</td>
+            <td
+              style="
+                max-width: 250px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              "
+            >
+              {{ log.details|default:"—" }}
+            </td>
+            <td class="mono">{{ log.ip_address }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="empty-state">No audit logs</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(e, tabId) {
+    document
+      .querySelectorAll(".tab-btn")
+      .forEach((b) => b.classList.remove("active"));
+    document
+      .querySelectorAll(".tab-content")
+      .forEach((c) => c.classList.remove("active"));
+    e.target.classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+  }
+</script>
+{% endblock %}

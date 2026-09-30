@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if results %}Bus Results - {{ origin }} to {{ destination }}{% else %}Search Buses{% endif %} - GoBus{% endblock %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/public.css' %}">{% endblock %}
+
+{% block content %}
+<section class="gb-page-hero">
+    <div class="container">
+        <h1>{{ origin|default:'Search' }}{% if destination %} &rarr; {{ destination }}{% endif %}</h1>
+        <p>{% if trip_date %}Journey date: {{ trip_date }}{% endif %}{% if trip_type == 'roundtrip' %} &middot; Round Trip{% endif %}</p>
+    </div>
+</section>
+<section class="gb-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 rounded-4 p-4">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-sliders-h me-2"></i>Search Again</h6>
+                    <form method="get" action="{% url 'core:search' %}">
+                        <input type="hidden" name="trip_type" value="{{ trip_type }}">
+                        <div class="mb-3">
+                            <label class="form-label">From</label>
+                            <input type="text" class="form-control" name="from" value="{{ origin }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">To</label>
+                            <input type="text" class="form-control" name="to" value="{{ destination }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" name="date" value="{{ trip_date }}" required>
+                        </div>
+                        <button type="submit" class="gb-search-btn mt-2"><i class="fas fa-search me-1"></i>Search</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                {% if results %}
+                    {% for s in results %}
+                    <div class="gb-bus-card">
+                        <div class="row align-items-center">
+                            <div class="col-lg-4 col-md-5">
+                                <div class="op">{{ s.bus.bus_name }}</div>
+                                <div>
+                                    <span class="rating"><i class="fas fa-star me-1"></i>4.{{ forloop.counter }}</span>
+                                </div>
+                                <div class="bus-type-badge mt-1">{{ s.bus.bus_type.name|default:'AC' }}{% if s.bus.bus_type.is_ac %} &middot; AC{% endif %}{% if s.bus.bus_type.is_sleeper %} &middot; Sleeper{% endif %}</div>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <div class="times d-flex justify-content-between align-items-center">
+                                    <div class="text-center">
+                                        <div class="time">{{ s.departure_time|time:"H:i" }}</div>
+                                        <div class="city">{{ s.route.origin }}</div>
+                                    </div>
+                                    <div class="duration text-center">
+                                        <div>~{{ s.route.estimated_duration }}</div>
+                                        <div class="small text-muted">Direct</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="time">{{ s.arrival_time|time:"H:i" }}</div>
+                                        <div class="city">{{ s.route.destination }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-3 text-md-end">
+                                <div class="fare">₹{{ s.fare }}</div>
+                                <div class="small text-muted mb-2">per passenger</div>
+                                <a class="gb-btn-solid" href="{% url 'accounts:login' %}{% if request.GET %}?next={% url 'passengers:seat_selection' s.id %}{% else %}?next={% url 'passengers:seat_selection' s.id %}{% endif %}">View Seats</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-bus fa-3x text-muted mb-3"></i>
+                        <h5 class="fw-bold">No buses found</h5>
+                        <p class="text-muted">Try a different route or date.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

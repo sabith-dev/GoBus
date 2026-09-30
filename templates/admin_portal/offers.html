@@ -1,0 +1,186 @@
+{% extends "admin_portal/base_admin.html" %} {% block content %}
+
+<div class="admin-offers">
+  <h1>Offers & Promotions</h1>
+  <p class="subtitle">Manage coupons, referrals, and campaigns</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(event, 'tab-coupons')">
+      Coupons
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-referrals')">
+      Referrals
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-festivals')">
+      Festival Campaigns
+    </button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-flash')">
+      Flash Sales
+    </button>
+  </div>
+
+  <div id="tab-coupons" class="tab-content active">
+    <div class="add-form">
+      <h3>Create Coupon</h3>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_coupon" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="code">Coupon Code</label>
+            <input
+              type="text"
+              id="code"
+              name="code"
+              placeholder="e.g. GOBUS50"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="discount_type">Type</label>
+            <select id="discount_type" name="discount_type" required>
+              <option value="percentage">Percentage (%)</option>
+              <option value="flat">Flat (₹)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="discount_value">Value</label>
+            <input
+              type="number"
+              id="discount_value"
+              name="discount_value"
+              min="1"
+              placeholder="e.g. 50"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="min_amount">Min Amount (₹)</label>
+            <input
+              type="number"
+              id="min_amount"
+              name="min_amount"
+              min="0"
+              placeholder="e.g. 200"
+            />
+          </div>
+          <div class="form-group">
+            <label for="max_uses">Max Uses</label>
+            <input
+              type="number"
+              id="max_uses"
+              name="max_uses"
+              min="1"
+              placeholder="e.g. 1000"
+            />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem">
+          Create Coupon
+        </button>
+      </form>
+    </div>
+
+    <div class="section-title">All Coupons</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Discount</th>
+            <th>Type</th>
+            <th>Used / Max</th>
+            <th>Valid Until</th>
+            <th>Active</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for coupon in coupons %}
+          <tr>
+            <td>
+              <strong style="color: var(--color-primary)"
+                >{{ coupon.code }}</strong
+              >
+            </td>
+            <td>
+              {% if coupon.discount_type == 'percentage' %}{{
+              coupon.discount_value }}%{% else %}₹{{ coupon.discount_value }}{% endif %}
+            </td>
+            <td>
+              <span class="badge badge-pink">{{ coupon.discount_type }}</span>
+            </td>
+            <td>
+              {{ coupon.used_count|default:"0" }} / {{
+              coupon.max_uses|default:"∞" }}
+            </td>
+            <td>{{ coupon.valid_until|date:"d M Y" }}</td>
+            <td>
+              {% if coupon.is_active %}<span class="badge badge-green"
+                >Active</span
+              >{% else %}<span class="badge badge-yellow">Inactive</span>{% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="empty-state">No coupons created yet</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-referrals" class="tab-content">
+    <div class="section-title">Referral Programs</div>
+    <p class="empty-state">Referral program management coming soon</p>
+  </div>
+
+  <div id="tab-festivals" class="tab-content">
+    <div class="section-title">Festival Campaigns</div>
+    {% for campaign in festival_campaigns %}
+    <div class="campaign-card">
+      <h4>{{ campaign.title }}</h4>
+      <p>{{ campaign.description }}</p>
+      <span
+        class="badge {% if campaign.is_active %}badge-green{% else %}badge-yellow{% endif %}"
+        >{{ campaign.is_active|yesno:"Active,Inactive" }}</span
+      >
+    </div>
+    {% empty %}
+    <p class="empty-state">No festival campaigns yet</p>
+    {% endfor %}
+  </div>
+
+  <div id="tab-flash" class="tab-content">
+    <div class="section-title">Flash Sales</div>
+    {% for sale in flash_sales %}
+    <div class="campaign-card">
+      <h4>{{ sale.title }}</h4>
+      <p>
+        {{ sale.description }} — {{ sale.discount_percent }}% off until {{
+        sale.end_date|date:"d M Y" }}
+      </p>
+      <span
+        class="badge {% if sale.is_active %}badge-green{% else %}badge-yellow{% endif %}"
+        >{{ sale.is_active|yesno:"Active,Inactive" }}</span
+      >
+    </div>
+    {% empty %}
+    <p class="empty-state">No flash sales running</p>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function switchTab(e, tabId) {
+    document
+      .querySelectorAll(".tab-btn")
+      .forEach((b) => b.classList.remove("active"));
+    document
+      .querySelectorAll(".tab-content")
+      .forEach((c) => c.classList.remove("active"));
+    e.target.classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+  }
+</script>
+{% endblock %}

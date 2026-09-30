@@ -1,0 +1,161 @@
+{% extends "admin_portal/base_admin.html" %} {% block content %}
+
+<div class="admin-users">
+  <h1>User Management</h1>
+  <p class="subtitle">Manage all registered users</p>
+
+  <form method="get" class="toolbar">
+    <div class="search-box">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search by name, email, or phone..."
+        value="{{ query|default:'' }}"
+      />
+    </div>
+    <div class="filter-tabs">
+      <a
+        href="?status=all"
+        class="filter-tab {% if not status_filter or status_filter == 'all' %}active{% endif %}"
+        >All</a
+      >
+      <a
+        href="?status=active"
+        class="filter-tab {% if status_filter == 'active' %}active{% endif %}"
+        >Active</a
+      >
+      <a
+        href="?status=inactive"
+        class="filter-tab {% if status_filter == 'inactive' %}active{% endif %}"
+        >Inactive</a
+      >
+      <a
+        href="?status=verified"
+        class="filter-tab {% if status_filter == 'verified' %}active{% endif %}"
+        >Verified</a
+      >
+      <a
+        href="?status=unverified"
+        class="filter-tab {% if status_filter == 'unverified' %}active{% endif %}"
+        >Unverified</a
+      >
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+    {% if query or status_filter %}<a
+      href="{% url 'admin_portal:users' %}"
+      class="btn btn-outline"
+      >Clear</a
+    >{% endif %}
+  </form>
+
+  <form method="post" id="bulkForm">
+    {% csrf_token %}
+    <div class="bulk-bar" id="bulkBar">
+      <label>
+        <input type="checkbox" id="selectAll" /> Select All
+      </label>
+      <select name="bulk_action" id="bulkAction">
+        <option value="">Bulk Actions</option>
+        <option value="verify">Verify</option>
+        <option value="suspend">Suspend</option>
+        <option value="activate">Activate</option>
+        <option value="ban">Ban</option>
+        <option value="delete">Delete</option>
+      </select>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        onclick="return confirm('Apply bulk action to selected users?');"
+      >
+        Apply
+      </button>
+    </div>
+
+    <p class="count-info">Showing {{ users|length }} of {{ total }} users</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 40px">
+              <input type="checkbox" id="selectAllHead" />
+            </th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Joined</th>
+            <th>Verified</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr
+            class="row-click"
+            onclick="window.location='{% url 'admin_portal:user_detail' u.id %}'"
+          >
+            <td onclick="event.stopPropagation()">
+              <label
+                ><input
+                  type="checkbox"
+                  name="selected_users"
+                  value="{{ u.id }}"
+                  class="user-check"
+              /></label>
+            </td>
+            <td><strong>{{ u.username }}</strong></td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.phone_number|default:"—" }}</td>
+            <td>{{ u.date_joined|date:"d M Y" }}</td>
+            <td>
+              {% if u.email_verified %}
+              <span class="badge badge-green">Verified</span>
+              {% else %}
+              <span class="badge badge-yellow">Pending</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if u.is_active %}
+              <span class="badge badge-green">Active</span>
+              {% else %}
+              <span class="badge badge-red">Inactive</span>
+              {% endif %}
+            </td>
+            <td onclick="event.stopPropagation()" class="actions-cell">
+              <a
+                href="{% url 'admin_portal:user_detail' u.id %}"
+                class="btn btn-outline btn-sm"
+                >View</a
+              >
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="empty-state">No users found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+</div>
+
+<script>
+  document
+    .getElementById("selectAllHead")
+    ?.addEventListener("change", function () {
+      document
+        .querySelectorAll(".user-check")
+        .forEach((c) => (c.checked = this.checked));
+      toggleBulkBar();
+    });
+  document
+    .querySelectorAll(".user-check")
+    .forEach((c) => c.addEventListener("change", toggleBulkBar));
+  function toggleBulkBar() {
+    const any = document.querySelectorAll(".user-check:checked").length > 0;
+    document.getElementById("bulkBar").classList.toggle("active", any);
+  }
+</script>
+{% endblock %}

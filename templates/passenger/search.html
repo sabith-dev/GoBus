@@ -1,0 +1,55 @@
+{% extends 'base_passenger.html' %}
+{% block title %}Search Buses - GoBus{% endblock %}
+{% block content %}
+<div class="admin-dash">
+    <div class="search-hero">
+        <h1>Where are you heading?</h1>
+        <p>Search buses, compare fares and book seats in seconds.</p>
+    </div>
+
+    <form method="get" action="{% url 'passengers:bus_results' %}">
+        <div class="panel-card">
+            <div class="panel-head">
+                <div class="panel-title">Trip Details</div>
+            </div>
+            <div class="panel-body">
+                <div style="display:grid; gap:1rem 1.25rem; grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <label class="form-label" for="id_source">From</label>
+                        <input type="text" name="source" id="id_source" class="form-control" placeholder="Source city" value="{{ source }}" required>
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_destination">To</label>
+                        <input type="text" name="destination" id="id_destination" class="form-control" placeholder="Destination city" value="{{ destination }}" required>
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_date">Travel Date</label>
+                        <input type="date" name="date" id="id_date" class="form-control" value="{{ date }}" required>
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_passengers">Passengers</label>
+                        <select name="passengers" id="id_passengers" class="form-select">
+                            <option {% if passengers == '1' %}selected{% endif %}>1</option>
+                            <option {% if passengers == '2' %}selected{% endif %}>2</option>
+                            <option {% if passengers == '3' %}selected{% endif %}>3</option>
+                            <option {% if passengers == '4' %}selected{% endif %}>4</option>
+                            <option {% if passengers == '5' %}selected{% endif %}>5</option>
+                            <option {% if passengers == '6' %}selected{% endif %}>6</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="action-buttons" style="margin-top:1.25rem;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                        Search Buses
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="portal-footer-links">
+        or <a href="{% url 'passengers:dashboard' %}">return to your dashboard</a>
+    </div>
+</div>
+{% endblock %}
